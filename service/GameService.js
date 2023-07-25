@@ -13,8 +13,12 @@ const GameService = {
 
       const createdGame = {
         name: game.name,
-        id: game._id,
+        id: game.id,
       };
+
+      // game.players.forEach(playerId => {
+      //   Player.findByIdAndUpdate(playerId, { games: [] })
+      // })
 
       return successResponse(createdGame);
     } catch (error) {

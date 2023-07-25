@@ -10,6 +10,13 @@ const Game = new mongoose.Schema(
         validate: [arrayLimit, "{PATH} must have only 2 players"],
       },
     ],
+    // players: [
+    //   {
+    //     type: String,
+    //     required: true,
+    //     // validate: [arrayLimit, "{PATH} must have only 2 players"],
+    //   },
+    // ],
     moves: [{ type: String }],
     name: {
       type: String,

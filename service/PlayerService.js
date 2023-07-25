@@ -1,6 +1,12 @@
-const { errorResponse, jwtResponse } = require("../domain/Response");
+const {
+  errorResponse,
+  jwtResponse,
+  successResponse,
+} = require("../domain/Response");
 const Player = require("../models/Player");
 const bcrypt = require("bcrypt");
+const JWT = require("jsonwebtoken");
+const { verifyJWT } = require("../utils");
 
 const PlayerService = {
   registerPlayer: async (playerInfo) => {
@@ -19,7 +25,8 @@ const PlayerService = {
       const createdPlayer = {
         name: player.name,
         email: player.email,
-        id: player._id,
+        id: player.id,
+        games: player.games,
       };
 
       return jwtResponse(createdPlayer);
@@ -42,7 +49,8 @@ const PlayerService = {
         const loggedInPlayer = {
           name: player.name,
           email: player.email,
-          id: player._id,
+          id: player.id,
+          games: player.games,
         };
 
         return jwtResponse(loggedInPlayer);
@@ -52,6 +60,29 @@ const PlayerService = {
     } catch (error) {
       return errorResponse(error);
     }
+  },
+
+  getCurrentGames: (request) => {
+    const decoded = JWT.decode(request._jwt);
+    return successResponse(decoded);
+  },
+
+  getOnlineUsers: async (request) => {
+    const decoded = verifyJWT(request._jwt);
+    if (decoded) {
+      const players = await Player.find();
+      const currentOnlinePlayers = players
+        .filter((player) => player.id !== decoded.id)
+        .map((player) => ({
+          id: player.id,
+          name: player.name,
+          isOnline: player.isOnline,
+          email: player.email,
+        }));
+
+      return successResponse(currentOnlinePlayers);
+    }
+    return errorResponse("Invalid request");
   },
 };
 

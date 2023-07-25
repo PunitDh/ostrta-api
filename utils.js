@@ -1,4 +1,5 @@
-const emitToSocket = (message, ...args) =>
-  io.to(socket.id).emit(message, ...args);
+const JWT = require("jsonwebtoken");
 
-module.exports = { emitToSocket };
+const verifyJWT = (jwt) => JWT.verify(jwt, process.env.JWT_SECRET);
+
+module.exports = { verifyJWT };

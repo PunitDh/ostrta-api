@@ -9,6 +9,7 @@ const SocketMessage = require("./socket-messages");
 const mongoose = require("./db");
 const playerService = require("./service/PlayerService");
 const gameService = require("./service/GameService");
+const appService = require("./service/AppService");
 const { Message } = require("./domain/Message");
 let io;
 
@@ -35,6 +36,12 @@ if (isProduction) {
 mongoose.connectToDB();
 
 io.on(SocketMessage.CONNECTION.request, (socket) => {
+  /**
+   * 
+   * @param {String} message 
+   * @param  {...any} args 
+   * @returns {}
+   */
   const emitToSocket = (message, ...args) => {
     console.log(message, ...args);
     return io.to(socket.id).emit(message, ...args);
@@ -54,10 +61,12 @@ io.on(SocketMessage.CONNECTION.request, (socket) => {
   };
 
   console.log("New connection started with socket ID: ", socket.id);
-
+  socket.respondTo(SocketMessage.GET_MESSAGES, appService.sendMessages);
   socket.respondTo(SocketMessage.REGISTER_USER, playerService.registerPlayer);
   socket.respondTo(SocketMessage.LOGIN_USER, playerService.loginPlayer);
   socket.respondTo(SocketMessage.CREATE_GAME, gameService.createGame);
+  socket.respondTo(SocketMessage.CURRENT_GAMES, playerService.getCurrentGames);
+  socket.respondTo(SocketMessage.CURRENT_USERS, playerService.getOnlineUsers);
   socket.respondTo(SocketMessage.PLAY_MOVE);
   socket.respondTo(SocketMessage.DISCONNECT);
 });
