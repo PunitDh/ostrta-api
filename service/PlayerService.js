@@ -2,14 +2,15 @@ const {
   errorResponse,
   jwtResponse,
   successResponse,
+  unauthorizedResponse,
 } = require("../domain/Response");
 const Player = require("../models/Player");
 const bcrypt = require("bcrypt");
-const JWT = require("jsonwebtoken");
-const { verifyJWT } = require("../utils");
+const { decodeJWT, playerMapper, gameMapper } = require("../utils");
+const Game = require("../models/Game");
 
 const PlayerService = {
-  registerPlayer: async (playerInfo) => {
+  async registerPlayer(playerInfo) {
     if (playerInfo.password !== playerInfo.confirmPassword) {
       return errorResponse("Passwords do not match");
     }
@@ -17,72 +18,68 @@ const PlayerService = {
     try {
       const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
       const player = await Player.create({
-        name: playerInfo.name,
+        firstName: playerInfo.firstName,
+        lastName: playerInfo.lastName,
         email: playerInfo.email,
         password: bcrypt.hashSync(playerInfo.password, salt),
       });
 
-      const createdPlayer = {
-        name: player.name,
-        email: player.email,
-        id: player.id,
-        games: player.games,
-      };
+      const createdPlayer = playerMapper(player);
 
       return jwtResponse(createdPlayer);
     } catch (error) {
-      if (error.code === 11000) {
-        return errorResponse("Email already exists");
-      } else {
-        return errorResponse(error.message);
-      }
+      return error.code === 11000
+        ? errorResponse("Email already exists")
+        : errorResponse(error.message);
     }
   },
 
-  loginPlayer: async (playerInfo) => {
+  async loginPlayer(playerInfo) {
     try {
       const player = await Player.findOne({
         email: playerInfo.email,
       });
 
       if (bcrypt.compareSync(playerInfo.password, player.password)) {
-        const loggedInPlayer = {
-          name: player.name,
-          email: player.email,
-          id: player.id,
-          games: player.games,
-        };
-
-        return jwtResponse(loggedInPlayer);
+        return jwtResponse(playerMapper(player));
       } else {
-        return errorResponse("Passwords do not match");
+        return unauthorizedResponse("Passwords do not match");
       }
     } catch (error) {
       return errorResponse(error);
     }
   },
 
-  getCurrentGames: (request) => {
-    const decoded = JWT.decode(request._jwt);
-    return successResponse(decoded);
+  async getCurrentGames(request) {
+    const decoded = decodeJWT(request._jwt);
+    if (decoded) {
+      const playerId = decoded.id;
+      const games = await Game.find({
+        players: playerId,
+        closed: false,
+      });
+
+      return successResponse(games.map(gameMapper));
+    }
+    return unauthorizedResponse();
   },
 
-  getOnlineUsers: async (request) => {
-    const decoded = verifyJWT(request._jwt);
+  async getOnlineUsers(request) {
+    const decoded = decodeJWT(request._jwt);
     if (decoded) {
       const players = await Player.find();
       const currentOnlinePlayers = players
         .filter((player) => player.id !== decoded.id)
-        .map((player) => ({
-          id: player.id,
-          name: player.name,
-          isOnline: player.isOnline,
-          email: player.email,
-        }));
+        .map(playerMapper);
 
       return successResponse(currentOnlinePlayers);
     }
-    return errorResponse("Invalid request");
+    return unauthorizedResponse();
+  },
+
+  async getPlayerName(playerId) {
+    const { firstName, lastName } = await Player.findById(playerId);
+    return { firstName, lastName };
   },
 };
 

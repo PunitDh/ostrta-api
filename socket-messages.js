@@ -1,13 +1,14 @@
-const { message } = require("./domain/Message");
+const { socketMessage } = require("./domain/Message");
 
 module.exports = {
-  GET_MESSAGES: message("get-messages", "messages"),
-  REGISTER_USER: message("register-user", "user-registered"),
-  LOGIN_USER: message("login-user", "user-logged-in"),
-  CREATE_GAME: message("create-game", "game-created"),
-  CONNECTION: message("connection", "user-connected"),
-  DISCONNECT: message("disconnect", "disconnected"),
-  PLAY_MOVE: message("play-move", "move-played"),
-  CURRENT_GAMES: message("get-current-games", "current-games"),
-  CURRENT_USERS: message("get-current-users", "current-users"),
+  GET_MESSAGES: socketMessage("get-messages", "messages"),
+  REGISTER_USER: socketMessage("register-user", "user-registered"),
+  LOGIN_USER: socketMessage("login-user", "user-logged-in"),
+  CREATE_GAME: socketMessage("create-game", "game-created"),
+  CONNECTION: socketMessage("connection", "user-connected"),
+  DISCONNECT: socketMessage("disconnect", "disconnected"),
+  PLAY_MOVE: socketMessage("play-move", "move-played"),
+  CURRENT_GAMES: socketMessage("get-current-games", "current-games"),
+  LOAD_GAME: socketMessage("load-game", "game-loaded"),
+  CURRENT_USERS: socketMessage("get-current-users", "current-users"),
 };

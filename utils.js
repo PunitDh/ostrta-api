@@ -1,5 +1,64 @@
 const JWT = require("jsonwebtoken");
+const Game = require("./models/Game");
 
-const verifyJWT = (jwt) => JWT.verify(jwt, process.env.JWT_SECRET);
+/**
+ *
+ * @param {String} jwt
+ * @returns {Object}
+ */
+const decodeJWT = (jwt) => {
+  try {
+    return JWT.verify(jwt, process.env.JWT_SECRET);
+  } catch (e) {
+    return false;
+  }
+};
 
-module.exports = { verifyJWT };
+/**
+ *
+ * @param {Object} request
+ * @param {String} request._jwt
+ * @returns {Boolean}
+ */
+const isAuthenticated = (request) => Boolean(decodeJWT(request._jwt));
+
+/**
+ *
+ * @param {Player} player
+ * @returns {Object}
+ */
+const playerMapper = (player) => ({
+  id: player._id,
+  firstName: player.firstName,
+  lastName: player.lastName,
+  isOnline: player.isOnline,
+  email: player.email,
+});
+
+class GameResponse {
+  constructor(game) {
+    if (game) {
+      this.id = game._id;
+      this.name = game.name;
+      this.players = game.players.map(playerMapper);
+      this.rounds = game.rounds;
+      this.closed = game.closed;
+      this.createdAt = game.createdAt;
+      this.updatedAt = game.updatedAt;
+    }
+  }
+}
+
+/**
+ *
+ * @param {Game} game
+ * @returns {GameResponse}
+ */
+const gameMapper = (game) => new GameResponse(game);
+
+module.exports = {
+  decodeJWT,
+  playerMapper,
+  gameMapper,
+  isAuthenticated,
+};

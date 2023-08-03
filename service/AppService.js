@@ -1,12 +1,11 @@
 const { errorResponse, successResponse } = require("../domain/Response");
-const JWT = require("jsonwebtoken");
 const SocketMessages = require("../socket-messages");
-const { verifyJWT } = require("../utils");
+const { decodeJWT } = require("../utils");
 
 const AppService = {
   sendMessages: async (token) => {
     try {
-      if (verifyJWT(token)) {
+      if (decodeJWT(token)) {
         return successResponse(SocketMessages);
       }
     } catch (error) {

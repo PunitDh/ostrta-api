@@ -5,11 +5,11 @@ class Message {
   }
 }
 
-function message(request, response) {
+function socketMessage(request, response) {
   return new Message(request, response);
 }
 
 module.exports = {
   Message,
-  message,
+  socketMessage,
 };

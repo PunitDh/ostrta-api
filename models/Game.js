@@ -7,27 +7,60 @@ const Game = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Player",
         required: true,
-        validate: [arrayLimit, "{PATH} must have only 2 players"],
       },
     ],
-    // players: [
-    //   {
-    //     type: String,
-    //     required: true,
-    //     // validate: [arrayLimit, "{PATH} must have only 2 players"],
-    //   },
-    // ],
-    moves: [{ type: String }],
     name: {
       type: String,
       required: true,
     },
+    closed: {
+      type: Boolean,
+      default: false,
+    },
+    rounds: [
+      {
+        moves: [
+          {
+            type: new mongoose.Schema(
+              {
+                player: {
+                  type: mongoose.Schema.Types.ObjectId,
+                  ref: "Player",
+                  required: true,
+                },
+                move: { type: String, required: true },
+              },
+              { timestamps: true }
+            ),
+          },
+        ],
+        winner: {
+          playerId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Player",
+            default: null,
+          },
+          firstName: {
+            type: String,
+            default: null,
+          },
+          lastName: {
+            type: String,
+            default: null,
+          },
+          method: {
+            type: String,
+            default: null,
+          },
+          reason: {
+            type: String,
+            default: null,
+          },
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
-
-function arrayLimit(val) {
-  return val.length === 2;
-}
 
 module.exports = mongoose.model("Game", Game);

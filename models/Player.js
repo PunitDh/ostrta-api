@@ -10,7 +10,11 @@ const Player = new mongoose.Schema({
     type: String,
     required: true,
   },
-  name: {
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
     type: String,
     required: true,
   },
@@ -18,12 +22,6 @@ const Player = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  games: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Game",
-    },
-  ],
 });
 
 module.exports = mongoose.model("Player", Player);
