@@ -16,6 +16,7 @@ let io;
 app.use(
   cors({
     origin: "*",
+    credentials: true,
   })
 );
 
@@ -26,6 +27,7 @@ if (isProduction) {
   io = require("socket.io")(process.env.PORT || 3000, {
     cors: {
       origin: "*",
+      credentials: true,
     },
   });
   console.log("Web socket server started locally");
