@@ -8,6 +8,7 @@ const Player = require("../models/Player");
 const bcrypt = require("bcrypt");
 const { decodeJWT, playerMapper, gameMapper } = require("../utils");
 const Game = require("../models/Game");
+const PlayerDAO = require("../dao/PlayerDAO");
 
 const PlayerService = {
   async registerPlayer(playerInfo) {
@@ -16,16 +17,8 @@ const PlayerService = {
     }
 
     try {
-      const salt = bcrypt.genSaltSync(Number(process.env.SALT_ROUNDS));
-      const player = await Player.create({
-        firstName: playerInfo.firstName,
-        lastName: playerInfo.lastName,
-        email: playerInfo.email,
-        password: bcrypt.hashSync(playerInfo.password, salt),
-      });
-
+      const player = await PlayerDAO.register(playerInfo);
       const createdPlayer = playerMapper(player);
-
       return jwtResponse(createdPlayer);
     } catch (error) {
       return error.code === 11000
@@ -75,11 +68,6 @@ const PlayerService = {
       return successResponse(currentOnlinePlayers);
     }
     return unauthorizedResponse();
-  },
-
-  async getPlayerName(playerId) {
-    const { firstName, lastName } = await Player.findById(playerId);
-    return { firstName, lastName };
   },
 };
 

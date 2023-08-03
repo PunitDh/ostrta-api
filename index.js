@@ -9,7 +9,6 @@ const SocketMessage = require("./socket-messages");
 const mongoose = require("./db");
 const playerService = require("./service/PlayerService");
 const gameService = require("./service/GameService");
-const appService = require("./service/AppService");
 const { Message } = require("./domain/Message");
 const { Status } = require("./domain/Response");
 let io;
@@ -55,7 +54,8 @@ io.on(SocketMessage.CONNECTION.request, (socket) => {
   socket.respondTo = function (message, callback) {
     this.on(message.request, async (arg) => {
       let response;
-      response = typeof callback === "function" ? await callback(arg) : arg;
+      response =
+        typeof callback === "function" ? await callback(arg, socket) : arg;
       if (response.status === Status.UNAUTHORIZED) {
         return emitToSocket(Status.UNAUTHORIZED, response);
       }
@@ -65,14 +65,21 @@ io.on(SocketMessage.CONNECTION.request, (socket) => {
 
   console.log("New connection started with socket ID: ", socket.id);
 
-  socket.respondTo(SocketMessage.GET_MESSAGES, appService.sendMessages);
   socket.respondTo(SocketMessage.REGISTER_USER, playerService.registerPlayer);
   socket.respondTo(SocketMessage.LOGIN_USER, playerService.loginPlayer);
   socket.respondTo(SocketMessage.CREATE_GAME, gameService.createGame);
   socket.respondTo(SocketMessage.CURRENT_GAMES, playerService.getCurrentGames);
   socket.respondTo(SocketMessage.CURRENT_USERS, playerService.getOnlineUsers);
   socket.respondTo(SocketMessage.LOAD_GAME, gameService.loadGame);
-  socket.respondTo(SocketMessage.PLAY_MOVE, gameService.playMove);
+
+  socket.on(SocketMessage.PLAY_MOVE.request, async (request) => {
+    const response = await gameService.playMove(request);
+    socket.join(request.gameId);
+    return io
+      .to(request.gameId)
+      .emit(SocketMessage.PLAY_MOVE.response, response);
+  });
+
   socket.respondTo(SocketMessage.DISCONNECT);
 });
 

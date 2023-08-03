@@ -1,7 +1,6 @@
 const { socketMessage } = require("./domain/Message");
 
 module.exports = {
-  GET_MESSAGES: socketMessage("get-messages", "messages"),
   REGISTER_USER: socketMessage("register-user", "user-registered"),
   LOGIN_USER: socketMessage("login-user", "user-logged-in"),
   CREATE_GAME: socketMessage("create-game", "game-created"),

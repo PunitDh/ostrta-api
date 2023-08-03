@@ -9,6 +9,7 @@ const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const Player = require("../models/Player");
 const GameDAO = require("../dao/GameDAO");
+const PlayerDAO = require("../dao/PlayerDAO");
 
 const GameService = {
   async createGame(gameInfo) {
@@ -34,9 +35,7 @@ const GameService = {
   async rename(request) {
     try {
       if (isAuthenticated(request)) {
-        const game = await Game.findByIdAndUpdate(request.gameId, {
-          name: request.name,
-        });
+        const game = await GameDAO.renameGame(request.gameId, request.name);
         return successResponse(game);
       }
       return unauthorizedResponse();
@@ -48,7 +47,7 @@ const GameService = {
   async close(request) {
     try {
       if (isAuthenticated(request)) {
-        const game = await Game.findByIdAndUpdate({ closed: true });
+        const game = await GameDAO.closeGame(request.gameId);
         return successResponse(game);
       }
       return unauthorizedResponse();
@@ -68,7 +67,6 @@ const GameService = {
   },
 
   async playMove(request) {
-    console.log({ request });
     if (isAuthenticated(request)) {
       const game = await GameDAO.findByIdAndPopulate(request.gameId);
 
@@ -89,7 +87,6 @@ const GameService = {
       }
 
       await game.save();
-
       return successResponse(gameMapper(game));
     } else {
       return unauthorizedResponse();
