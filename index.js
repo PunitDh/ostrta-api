@@ -13,12 +13,7 @@ const { Message } = require("./domain/Message");
 const { Status } = require("./domain/Response");
 let io;
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST"],
-  })
-);
+app.use(cors());
 
 if (isProduction) {
   io = require("socket.io")(http);
