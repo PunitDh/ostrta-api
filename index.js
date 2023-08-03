@@ -13,7 +13,11 @@ const { Message } = require("./domain/Message");
 const { Status } = require("./domain/Response");
 let io;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 if (isProduction) {
   io = require("socket.io")(http);
@@ -21,8 +25,7 @@ if (isProduction) {
 } else {
   io = require("socket.io")(process.env.PORT || 3000, {
     cors: {
-      origin: process.env.FRONTEND_URL,
-      methods: ["GET", "POST"],
+      origin: "*",
     },
   });
   console.log("Web socket server started locally");
