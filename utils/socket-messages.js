@@ -1,4 +1,4 @@
-const { socketMessage } = require("./domain/Message");
+const { socketMessage } = require("../domain/Message");
 
 module.exports = {
   REGISTER_USER: socketMessage("register-user", "user-registered"),

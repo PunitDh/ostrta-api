@@ -1,5 +1,5 @@
 const JWT = require("jsonwebtoken");
-const Game = require("./models/Game");
+const Game = require("../models/Game");
 
 /**
  *
