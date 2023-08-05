@@ -18,8 +18,7 @@ const PlayerService = {
 
     try {
       const player = await PlayerDAO.register(playerInfo);
-      const createdPlayer = playerMapper(player);
-      return jwtResponse(createdPlayer);
+      return jwtResponse(playerMapper(player));
     } catch (error) {
       return error.code === 11000
         ? errorResponse("Email already exists")
@@ -41,6 +40,15 @@ const PlayerService = {
     } catch (error) {
       return errorResponse(error);
     }
+  },
+
+  async updateProfile(request) {
+    const decoded = decodeJWT(request._jwt);
+    if (decoded) {
+      const player = await Player.findByIdAndUpdate(decoded.id, request);
+      return jwtResponse(playerMapper(player));
+    }
+    return unauthorizedResponse();
   },
 
   async getCurrentGames(request) {

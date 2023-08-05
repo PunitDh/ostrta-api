@@ -22,6 +22,10 @@ const Player = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  avatar: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Player", Player);

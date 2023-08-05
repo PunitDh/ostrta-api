@@ -58,6 +58,7 @@ io.on(SocketMessage.CONNECTION.request, (socket) => {
 
   respondTo(SocketMessage.REGISTER_USER, playerService.registerPlayer);
   respondTo(SocketMessage.LOGIN_USER, playerService.loginPlayer);
+  respondTo(SocketMessage.UPDATE_PROFILE, playerService.updateProfile);
   respondTo(SocketMessage.CREATE_GAME, gameService.createGame);
   respondTo(SocketMessage.CURRENT_GAMES, playerService.getCurrentGames);
   respondTo(SocketMessage.CURRENT_USERS, playerService.getOnlineUsers);

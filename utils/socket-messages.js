@@ -3,6 +3,7 @@ const { socketMessage } = require("../domain/Message");
 module.exports = {
   REGISTER_USER: socketMessage("register-user", "user-registered"),
   LOGIN_USER: socketMessage("login-user", "user-logged-in"),
+  UPDATE_PROFILE: socketMessage("update-profile", "profile-updated"),
   CREATE_GAME: socketMessage("create-game", "game-created"),
   CONNECTION: socketMessage("connection", "user-connected"),
   DISCONNECT: socketMessage("disconnect", "disconnected"),
