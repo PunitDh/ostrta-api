@@ -36,7 +36,21 @@ const GameService = {
     try {
       if (isAuthenticated(request)) {
         const game = await GameDAO.renameGame(request.gameId, request.name);
-        return successResponse(game);
+        return successResponse(gameMapper(game));
+      }
+      return unauthorizedResponse();
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
+  async resetRounds(request) {
+    try {
+      if (isAuthenticated(request)) {
+        const game = await Game.findByIdAndUpdate(request.gameId, {
+          rounds: [],
+        });
+        return successResponse(gameMapper(game));
       }
       return unauthorizedResponse();
     } catch (error) {

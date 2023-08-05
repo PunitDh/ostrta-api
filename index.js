@@ -5,13 +5,13 @@ const http = require("http").Server(app);
 require("dotenv").config();
 const port = process.env.PORT || 3000;
 const isProduction = process.env.NODE_ENV === "production";
-const SocketMessage = require("./utils/socket-messages");
 const mongoose = require("./db");
 const playerService = require("./service/PlayerService");
 const gameService = require("./service/GameService");
-const { Message } = require("./domain/Message");
-const { Status } = require("./domain/Response");
+const SocketEvent = require("./domain/SocketEvent");
+const { Status, unauthorizedResponse } = require("./domain/Response");
 const { corsOptions } = require("./utils/constants");
+const { isAuthenticated } = require("./utils");
 let io;
 
 app.use(cors(corsOptions));
@@ -26,7 +26,7 @@ if (isProduction) {
 
 mongoose.connectToDB();
 
-io.on(SocketMessage.CONNECTION.request, (socket) => {
+io.on(SocketEvent.CONNECTION.request, (socket) => {
   /**
    *
    * @param {String} message
@@ -39,40 +39,51 @@ io.on(SocketMessage.CONNECTION.request, (socket) => {
 
   /**
    *
-   * @param {Message} message
+   * @param {SocketEvent} event
    * @param {Function} callback
    */
-  const respondTo = function (message, callback) {
-    socket.on(message.request, async (arg) => {
+  const respondTo = function (event, callback, secured = true) {
+    socket.on(event.request, async (request) => {
       let response;
       response =
-        typeof callback === "function" ? await callback(arg, socket) : arg;
+        typeof callback === "function" ? await callback(request) : request;
+
+      if (secured) {
+        if (isAuthenticated(request)) {
+          response =
+            typeof callback === "function" ? await callback(request) : request;
+        } else {
+          response = unauthorizedResponse();
+        }
+      } else {
+        response =
+          typeof callback === "function" ? await callback(request) : request;
+      }
       if (response.status === Status.UNAUTHORIZED) {
         return emitToSocket(Status.UNAUTHORIZED, response);
       }
-      return emitToSocket(message.response, response);
+      return emitToSocket(event.response, response);
     });
   };
 
   console.log("New connection started with socket ID: ", socket.id);
 
-  respondTo(SocketMessage.REGISTER_USER, playerService.registerPlayer);
-  respondTo(SocketMessage.LOGIN_USER, playerService.loginPlayer);
-  respondTo(SocketMessage.UPDATE_PROFILE, playerService.updateProfile);
-  respondTo(SocketMessage.CREATE_GAME, gameService.createGame);
-  respondTo(SocketMessage.CURRENT_GAMES, playerService.getCurrentGames);
-  respondTo(SocketMessage.CURRENT_USERS, playerService.getOnlineUsers);
-  respondTo(SocketMessage.LOAD_GAME, gameService.loadGame);
+  respondTo(SocketEvent.REGISTER_USER, playerService.registerPlayer, false);
+  respondTo(SocketEvent.LOGIN_USER, playerService.loginPlayer, false);
+  respondTo(SocketEvent.UPDATE_PROFILE, playerService.updateProfile);
+  respondTo(SocketEvent.CREATE_GAME, gameService.createGame);
+  respondTo(SocketEvent.CURRENT_GAMES, playerService.getCurrentGames);
+  respondTo(SocketEvent.CURRENT_USERS, playerService.getOnlineUsers);
+  respondTo(SocketEvent.LOAD_GAME, gameService.loadGame);
 
-  socket.on(SocketMessage.PLAY_MOVE.request, async (request) => {
+  socket.on(SocketEvent.PLAY_MOVE.request, async (request) => {
     const response = await gameService.playMove(request);
     socket.join(request.gameId);
-    return io
-      .to(request.gameId)
-      .emit(SocketMessage.PLAY_MOVE.response, response);
+    console.log(io.sockets.adapter.rooms);
+    return io.to(request.gameId).emit(SocketEvent.PLAY_MOVE.response, response);
   });
 
-  respondTo(SocketMessage.DISCONNECT);
+  respondTo(SocketEvent.DISCONNECT);
 });
 
 isProduction &&
