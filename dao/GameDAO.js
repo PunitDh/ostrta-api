@@ -48,6 +48,12 @@ const GameDAO = {
       closed: false,
     });
   },
+  getRecentGames: async function () {
+    return await Game.find({ closed: false })
+      .sort({ updatedAt: -1 })
+      .populate("players")
+      .exec();
+  },
 };
 
 module.exports = GameDAO;

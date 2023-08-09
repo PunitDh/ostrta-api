@@ -21,6 +21,7 @@ class SocketEvent {
   static PLAY_MOVE = new SocketEvent("play-move", "move-played");
   static LOAD_GAME = new SocketEvent("load-game", "game-loaded");
   static RESET_ROUNDS = new SocketEvent("reset-rounds", "rounds-reset");
+  static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 }
 
 module.exports = SocketEvent;

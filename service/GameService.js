@@ -3,7 +3,7 @@ const {
   successResponse,
   notFoundResponse,
 } = require("../domain/Response");
-const { gameMapper } = require("../utils");
+const { gameMapper, recentGameMapper } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
@@ -33,6 +33,15 @@ const GameService = {
     try {
       const game = await GameDAO.resetRounds(request.gameId);
       return successResponse(gameMapper(game));
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
+  async getRecentGames() {
+    try {
+      const games = await GameDAO.getRecentGames();
+      return successResponse(games.map(gameMapper));
     } catch (error) {
       return errorResponse(error);
     }
@@ -80,19 +89,19 @@ const GameService = {
 
 async function calculateRoundWinner(round) {
   const winningMoves = {
-    Rock: ["Scissors", "Lizard"],
-    Scissors: ["Paper", "Lizard"],
-    Paper: ["Rock", "Spock"],
-    Lizard: ["Spock", "Paper"],
-    Spock: ["Scissors", "Rock"],
+    Rock: [Scissors, Lizard],
+    Scissors: [Paper, Lizard],
+    Paper: [Rock, Spock],
+    Lizard: [Spock, Paper],
+    Spock: [Scissors, Rock],
   };
 
   const moveMethods = {
-    Rock: ["crushes Scissors", "crushes Lizard"],
-    Scissors: ["cuts Paper", "decapitates Lizard"],
-    Paper: ["covers Rock", "disproves Spock"],
-    Lizard: ["poisons Spock", "eats Paper"],
-    Spock: ["smashes Scissors", "vaporizes Rock"],
+    Rock: [`crushes ${Scissors}`, `crushes ${Lizard}`],
+    Scissors: [`cuts ${Paper}`, `decapitates ${Lizard}`],
+    Paper: [`covers ${Rock}`, `disproves ${Spock}`],
+    Lizard: [`poisons ${Spock}`, `eats ${Paper}`],
+    Spock: [`smashes ${Scissors}`, `vaporizes ${Rock}`],
   };
 
   const findMethod = (move, opponentMove) =>
