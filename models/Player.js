@@ -20,11 +20,15 @@ const Player = new mongoose.Schema({
   },
   isOnline: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   avatar: {
     type: Number,
     required: true,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
   },
 });
 

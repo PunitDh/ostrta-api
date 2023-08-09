@@ -3,12 +3,13 @@ const {
   jwtResponse,
   successResponse,
   unauthorizedResponse,
+  forbiddenResponse,
 } = require("../domain/Response");
 const Player = require("../models/Player");
 const bcrypt = require("bcrypt");
 const { decodeJWT, playerMapper, gameMapper } = require("../utils");
-const Game = require("../models/Game");
 const PlayerDAO = require("../dao/PlayerDAO");
+const GameDAO = require("../dao/GameDAO");
 
 const PlayerService = {
   async registerPlayer(playerInfo) {
@@ -32,6 +33,10 @@ const PlayerService = {
         email: playerInfo.email,
       });
 
+      if (!player) {
+        return unauthorizedResponse("Email address not found");
+      }
+
       if (bcrypt.compareSync(playerInfo.password, player.password)) {
         return jwtResponse(playerMapper(player));
       } else {
@@ -48,18 +53,29 @@ const PlayerService = {
       const player = await Player.findByIdAndUpdate(decoded.id, request);
       return jwtResponse(playerMapper(player));
     }
-    return unauthorizedResponse();
+    return forbiddenResponse();
+  },
+
+  async deleteProfile(request) {
+    const decoded = decodeJWT(request._jwt);
+    if (decoded) {
+      const player = await Player.findById(decoded.id);
+      if (bcrypt.compareSync(request.password, player.password)) {
+        const games = await GameDAO.findByPlayerId(decoded.id);
+        for (const game of games) {
+          await GameDAO.closeGame(game._id);
+        }
+        await player.deleteOne();
+      }
+      return playerMapper(player);
+    }
+    return forbiddenResponse();
   },
 
   async getCurrentGames(request) {
     const decoded = decodeJWT(request._jwt);
     if (decoded) {
-      const playerId = decoded.id;
-      const games = await Game.find({
-        players: playerId,
-        closed: false,
-      });
-
+      const games = await GameDAO.findByPlayerId(decoded.id);
       return successResponse(games.map(gameMapper));
     }
     return unauthorizedResponse();
@@ -73,9 +89,22 @@ const PlayerService = {
         .filter((player) => player.id !== decoded.id)
         .map(playerMapper);
 
+      console.log({ currentOnlinePlayers });
+
       return successResponse(currentOnlinePlayers);
     }
     return unauthorizedResponse();
+  },
+
+  async goOffline(socketMap, socketId) {
+    const email = Object.keys(socketMap).find(
+      (key) => socketMap[key] === socketId
+    );
+    if (email) {
+      const player = await Player.findOne({ email });
+      player.isOnline = false;
+      await player.save();
+    }
   },
 };
 

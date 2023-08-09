@@ -10,7 +10,12 @@ const PlayerDAO = {
       lastName: playerInfo.lastName,
       email: playerInfo.email,
       password: bcrypt.hashSync(playerInfo.password, salt),
+      avatar: playerInfo.avatar,
     });
+  },
+  getNames: async function (playerId) {
+    const { firstName, lastName } = await Player.findById(playerId);
+    return { firstName, lastName };
   },
 };
 

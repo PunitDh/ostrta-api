@@ -11,7 +11,7 @@ const gameService = require("./service/GameService");
 const SocketEvent = require("./domain/SocketEvent");
 const { Status, unauthorizedResponse } = require("./domain/Response");
 const { corsOptions } = require("./utils/constants");
-const { isAuthenticated } = require("./utils");
+const { isAuthenticated, decodeJWT} = require("./utils");
 let io;
 
 app.use(cors(corsOptions));
@@ -26,64 +26,77 @@ if (isProduction) {
 
 mongoose.connectToDB();
 
+const socketMap = {};
+
 io.on(SocketEvent.CONNECTION.request, (socket) => {
   /**
    *
-   * @param {String} message
-   * @param  {...any} args
+   * @param {SocketEvent} socketEvent
+   * @param {Function} callback
+   * @param {Object} request
+   * @param {Boolean} useRoom
+   * @returns {*}
    */
-  const emitToSocket = (message, ...args) => {
-    console.log(message, ...args);
-    return io.to(socket.id).emit(message, ...args);
+  const socketResponse = async (socketEvent, callback, request, useRoom) => {
+    const { email } = decodeJWT(request._jwt);
+    email && (socketMap[email] = socket.id);
+    const response =
+      typeof callback === "function" ? await callback(request) : request;
+    const target = useRoom ? request.gameId : socket.id;
+    useRoom && socket.join(target);
+    return io.to(target).emit(socketEvent.response, response);
   };
 
   /**
-   *
-   * @param {SocketEvent} event
+   * Unsecured request
+   * @param {SocketEvent} socketEvent
    * @param {Function} callback
+   * @param {Boolean} useRoom
    */
-  const respondTo = function (event, callback, secured = true) {
-    socket.on(event.request, async (request) => {
-      let response;
-      response =
-        typeof callback === "function" ? await callback(request) : request;
+  const unsecuredResponseTo = function (
+    socketEvent,
+    callback,
+    useRoom = false
+  ) {
+    socket.on(socketEvent.request, (request) =>
+      socketResponse(socketEvent, callback, request, useRoom)
+    );
+  };
 
-      if (secured) {
-        if (isAuthenticated(request)) {
-          response =
-            typeof callback === "function" ? await callback(request) : request;
-        } else {
-          response = unauthorizedResponse();
-        }
-      } else {
-        response =
-          typeof callback === "function" ? await callback(request) : request;
-      }
-      if (response.status === Status.UNAUTHORIZED) {
-        return emitToSocket(Status.UNAUTHORIZED, response);
-      }
-      return emitToSocket(event.response, response);
-    });
+  /**
+   * Secured request
+   * @param {SocketEvent} socketEvent
+   * @param {Function} callback
+   * @param {Boolean} useRoom
+   */
+  const securedResponseTo = function (socketEvent, callback, useRoom = false) {
+    socket.on(socketEvent.request, (request) =>
+      isAuthenticated(request)
+        ? socketResponse(socketEvent, callback, request, useRoom)
+        : io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse())
+    );
   };
 
   console.log("New connection started with socket ID: ", socket.id);
 
-  respondTo(SocketEvent.REGISTER_USER, playerService.registerPlayer, false);
-  respondTo(SocketEvent.LOGIN_USER, playerService.loginPlayer, false);
-  respondTo(SocketEvent.UPDATE_PROFILE, playerService.updateProfile);
-  respondTo(SocketEvent.CREATE_GAME, gameService.createGame);
-  respondTo(SocketEvent.CURRENT_GAMES, playerService.getCurrentGames);
-  respondTo(SocketEvent.CURRENT_USERS, playerService.getOnlineUsers);
-  respondTo(SocketEvent.LOAD_GAME, gameService.loadGame);
+  unsecuredResponseTo(SocketEvent.REGISTER_USER, playerService.registerPlayer);
+  unsecuredResponseTo(SocketEvent.LOGIN_USER, playerService.loginPlayer);
 
-  socket.on(SocketEvent.PLAY_MOVE.request, async (request) => {
-    const response = await gameService.playMove(request);
-    socket.join(request.gameId);
-    console.log(io.sockets.adapter.rooms);
-    return io.to(request.gameId).emit(SocketEvent.PLAY_MOVE.response, response);
+  securedResponseTo(SocketEvent.UPDATE_PROFILE, playerService.updateProfile);
+  securedResponseTo(SocketEvent.DELETE_PROFILE, playerService.deleteProfile);
+
+  securedResponseTo(SocketEvent.CREATE_GAME, gameService.createGame);
+  securedResponseTo(SocketEvent.CURRENT_GAMES, playerService.getCurrentGames);
+  securedResponseTo(SocketEvent.CURRENT_USERS, playerService.getOnlineUsers);
+  securedResponseTo(SocketEvent.RESET_ROUNDS, gameService.resetRounds);
+
+  securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
+  securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
+
+  // unsecuredResponseTo(SocketEvent.DISCONNECT);
+  socket.on("disconnect", async () => {
+    await playerService.goOffline(socketMap, socket.id);
   });
-
-  respondTo(SocketEvent.DISCONNECT);
 });
 
 isProduction &&

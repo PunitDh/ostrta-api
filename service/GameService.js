@@ -1,32 +1,15 @@
-const {
-  errorResponse,
-  successResponse,
-  unauthorizedResponse,
-} = require("../domain/Response");
-const Game = require("../models/Game");
-const { isAuthenticated, gameMapper } = require("../utils");
+const { errorResponse, successResponse } = require("../domain/Response");
+const { gameMapper } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
-const Player = require("../models/Player");
 const GameDAO = require("../dao/GameDAO");
 const PlayerDAO = require("../dao/PlayerDAO");
 
 const GameService = {
   async createGame(gameInfo) {
     try {
-      const games = await Game.find();
-      const game = await Game.create({
-        name: `Game ${games.length + 1}`,
-        players: gameInfo.players,
-        rounds: [new Round()],
-      });
-
-      const createdGame = {
-        name: game.name,
-        id: game.id,
-      };
-
-      return successResponse(createdGame);
+      const game = await GameDAO.createGame(gameInfo);
+      return successResponse(game);
     } catch (error) {
       return errorResponse(error.message);
     }
@@ -34,11 +17,8 @@ const GameService = {
 
   async rename(request) {
     try {
-      if (isAuthenticated(request)) {
-        const game = await GameDAO.renameGame(request.gameId, request.name);
-        return successResponse(gameMapper(game));
-      }
-      return unauthorizedResponse();
+      const game = await GameDAO.renameGame(request.gameId, request.name);
+      return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error);
     }
@@ -46,13 +26,8 @@ const GameService = {
 
   async resetRounds(request) {
     try {
-      if (isAuthenticated(request)) {
-        const game = await Game.findByIdAndUpdate(request.gameId, {
-          rounds: [],
-        });
-        return successResponse(gameMapper(game));
-      }
-      return unauthorizedResponse();
+      const game = await GameDAO.resetRounds(request.gameId);
+      return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error);
     }
@@ -60,51 +35,41 @@ const GameService = {
 
   async close(request) {
     try {
-      if (isAuthenticated(request)) {
-        const game = await GameDAO.closeGame(request.gameId);
-        return successResponse(game);
-      }
-      return unauthorizedResponse();
+      const game = await GameDAO.closeGame(request.gameId);
+      return successResponse(game);
     } catch (error) {
       return errorResponse(error);
     }
   },
 
   async loadGame(request) {
-    if (isAuthenticated(request)) {
-      const game = await GameDAO.findByIdAndPopulate(request.gameId);
-      return game
-        ? successResponse(gameMapper(game))
-        : errorResponse(`No game found with gameId: ${request.gameId}`, 404);
-    }
-    return unauthorizedResponse();
+    const game = await GameDAO.findByIdAndPopulate(request.gameId);
+    return game
+      ? successResponse(gameMapper(game))
+      : errorResponse(`No game found with gameId: ${request.gameId}`, 404);
   },
 
   async playMove(request) {
-    if (isAuthenticated(request)) {
-      const game = await GameDAO.findByIdAndPopulate(request.gameId);
+    const game = await GameDAO.findByIdAndPopulate(request.gameId);
 
-      const move = {
-        player: request.playerId,
-        move: request.move,
-      };
+    const move = {
+      player: request.playerId,
+      move: request.move,
+    };
 
-      let lastRound = game.rounds[game.rounds.length - 1];
+    let lastRound = game.rounds[game.rounds.length - 1];
 
-      if (lastRound.moves.length < 2) {
-        lastRound.moves.push(move);
-      }
-
-      if (lastRound.moves.length === 2) {
-        lastRound.winner = await calculateWinner(lastRound);
-        game.rounds.push(new Round());
-      }
-
-      await game.save();
-      return successResponse(gameMapper(game));
-    } else {
-      return unauthorizedResponse();
+    if (lastRound.moves.length < 2) {
+      lastRound.moves.push(move);
     }
+
+    if (lastRound.moves.length === 2) {
+      lastRound.winner = await calculateWinner(lastRound);
+      game.rounds.push(new Round());
+    }
+
+    await game.save();
+    return successResponse(gameMapper(game));
   },
 };
 
@@ -129,17 +94,17 @@ async function calculateWinner(round) {
     methods[move].find((it) => it.includes(opponentMove));
 
   const getResult = async (playerId, move, opponentMove) => {
-    const { firstName, lastName } = await Player.findById(playerId);
+    const { firstName, lastName } = await PlayerDAO.getNames(playerId);
     const method = findMethod(move, opponentMove);
     const reason = `${move} ${method}`;
-    return { playerId, method, reason, firstName, lastName };
+    return { playerId, firstName, lastName, method, reason };
   };
 
   if (round.moves[0].move === round.moves[1].move) {
     return {
-      playerId: null,
       method: "Tie",
       reason: "Tie",
+      playerId: null,
       firstName: null,
       lastName: null,
     };

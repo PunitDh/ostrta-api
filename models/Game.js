@@ -26,9 +26,8 @@ const Game = new mongoose.Schema(
                 player: {
                   type: mongoose.Schema.Types.ObjectId,
                   ref: "Player",
-                  required: true,
                 },
-                move: { type: String, required: true },
+                move: { type: String },
               },
               { timestamps: true }
             ),

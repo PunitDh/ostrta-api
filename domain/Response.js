@@ -2,8 +2,10 @@ const JWT = require("jsonwebtoken");
 
 const Status = {
   SUCCESS: "success",
+  CREATED: "created",
   ERROR: "error",
   UNAUTHORIZED: "unauthorized",
+  FORBIDDEN: "forbidden",
 };
 
 class Response {
@@ -36,12 +38,24 @@ function successResponse(payload, code = 200) {
   return new Response(Status.SUCCESS, payload, code);
 }
 
+function createdResponse(payload, code = 201) {
+  return new Response(Status.CREATED, payload, code);
+}
+
 function errorResponse(message, code = 400) {
   return new Response(Status.ERROR, message, code);
 }
 
 function unauthorizedResponse(message = "Unauthorized", code = 401) {
   return new Response(Status.UNAUTHORIZED, message, code);
+}
+
+function forbiddenResponse(message = "Forbidden", code = 403) {
+  return new Response(Status.FORBIDDEN, message, code);
+}
+
+function notFoundResponse(message = "Not Found", code = 404) {
+  return new Response(Status.ERROR, message, code);
 }
 
 function jwtResponse(payload) {
@@ -53,8 +67,11 @@ function jwtResponse(payload) {
 
 module.exports = {
   successResponse,
+  createdResponse,
   errorResponse,
   unauthorizedResponse,
+  forbiddenResponse,
+  notFoundResponse,
   jwtResponse,
   Status,
 };
