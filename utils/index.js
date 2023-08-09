@@ -35,6 +35,8 @@ const playerMapper = (player) => ({
   email: player.email,
   avatar: player.avatar,
   isAdmin: player.isAdmin,
+  wins: player.wins,
+  losses: player.losses,
 });
 
 class GameResponse {

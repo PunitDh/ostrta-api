@@ -23,6 +23,18 @@ const PlayerDAO = {
     });
     return player;
   },
+  addWin: async function (playerId, win = 1) {
+    const player = await Player.findById(playerId);
+    player.wins += win;
+    await player.save();
+    return player;
+  },
+  addLoss: async function (playerId, loss = 1) {
+    const player = await Player.findById(playerId);
+    player.losses += loss;
+    await player.save();
+    return player;
+  },
 };
 
 module.exports = PlayerDAO;

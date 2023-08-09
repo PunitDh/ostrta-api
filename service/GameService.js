@@ -8,6 +8,7 @@ const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
 const PlayerDAO = require("../dao/PlayerDAO");
+const Winner = require("../domain/Winner");
 
 const GameService = {
   async createGame(gameInfo) {
@@ -68,7 +69,7 @@ const GameService = {
     }
 
     if (lastRound.moves.length === 2) {
-      lastRound.winner = await calculateWinner(lastRound);
+      lastRound.winner = await calculateRoundWinner(lastRound);
       game.rounds.push(new Round());
     }
 
@@ -77,54 +78,58 @@ const GameService = {
   },
 };
 
-async function calculateWinner(round) {
-  const winners = {
-    Rock: [Scissors, Lizard],
-    Scissors: [Paper, Lizard],
-    Paper: [Rock, Spock],
-    Lizard: [Spock, Paper],
-    Spock: [Scissors, Rock],
+async function calculateRoundWinner(round) {
+  const winningMoves = {
+    Rock: ["Scissors", "Lizard"],
+    Scissors: ["Paper", "Lizard"],
+    Paper: ["Rock", "Spock"],
+    Lizard: ["Spock", "Paper"],
+    Spock: ["Scissors", "Rock"],
   };
 
-  const methods = {
-    Rock: [`crushes ${Scissors}`, `crushes ${Lizard}`],
-    Scissors: [`cuts ${Paper}`, `decapitates ${Lizard}`],
-    Paper: [`covers ${Rock}`, `disproves ${Spock}`],
-    Lizard: [`poisons ${Spock}`, `eats ${Paper}`],
-    Spock: [`smashes ${Scissors}`, `vaporizes ${Rock}`],
+  const moveMethods = {
+    Rock: ["crushes Scissors", "crushes Lizard"],
+    Scissors: ["cuts Paper", "decapitates Lizard"],
+    Paper: ["covers Rock", "disproves Spock"],
+    Lizard: ["poisons Spock", "eats Paper"],
+    Spock: ["smashes Scissors", "vaporizes Rock"],
   };
 
   const findMethod = (move, opponentMove) =>
-    methods[move].find((it) => it.includes(opponentMove));
+    moveMethods[move].find((method) => method.includes(opponentMove));
 
-  const getResult = async (playerId, move, opponentMove) => {
-    const { firstName, lastName } = await PlayerDAO.getNames(playerId);
+  const generateWinner = async (winnerId, loserId, move, opponentMove) => {
+    const winner = await PlayerDAO.addWin(winnerId);
+    await PlayerDAO.addLoss(loserId);
+    const { firstName, lastName } = winner;
     const method = findMethod(move, opponentMove);
     const reason = `${move} ${method}`;
-    return { playerId, firstName, lastName, method, reason };
+    return new Winner({
+      playerId: winnerId,
+      firstName,
+      lastName,
+      method,
+      reason,
+    });
   };
 
   if (round.moves[0].move === round.moves[1].move) {
-    return {
-      method: "Tie",
-      reason: "Tie",
-      playerId: null,
-      firstName: null,
-      lastName: null,
-    };
+    return new Winner({ method: "Tie", reason: "Tie" });
   }
 
-  if (winners[round.moves[0].move].includes(round.moves[1].move)) {
-    return getResult(
+  if (winningMoves[round.moves[0].move].includes(round.moves[1].move)) {
+    return generateWinner(
       round.moves[0].player,
+      round.moves[1].player,
       round.moves[0].move,
       round.moves[1].move
     );
   }
 
-  if (winners[round.moves[1].move].includes(round.moves[0].move)) {
-    return getResult(
+  if (winningMoves[round.moves[1].move].includes(round.moves[0].move)) {
+    return generateWinner(
       round.moves[1].player,
+      round.moves[0].player,
       round.moves[1].move,
       round.moves[0].move
     );

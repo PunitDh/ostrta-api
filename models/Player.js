@@ -30,6 +30,14 @@ const Player = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  wins: {
+    type: Number,
+    default: 0,
+  },
+  losses: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("Player", Player);
