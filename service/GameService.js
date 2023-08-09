@@ -1,4 +1,8 @@
-const { errorResponse, successResponse } = require("../domain/Response");
+const {
+  errorResponse,
+  successResponse,
+  notFoundResponse,
+} = require("../domain/Response");
 const { gameMapper } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
@@ -46,7 +50,7 @@ const GameService = {
     const game = await GameDAO.findByIdAndPopulate(request.gameId);
     return game
       ? successResponse(gameMapper(game))
-      : errorResponse(`No game found with gameId: ${request.gameId}`, 404);
+      : notFoundResponse(`No game found with gameId: ${request.gameId}`);
   },
 
   async playMove(request) {

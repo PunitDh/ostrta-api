@@ -5,7 +5,7 @@ const GameDAO = {
   findByIdAndPopulate: async function (gameId) {
     return await Game.findById(gameId).populate("players").exec();
   },
-  createGame: async function () {
+  createGame: async function (gameInfo) {
     const games = await Game.find();
     const game = await Game.create({
       name: `Game ${games.length + 1}`,

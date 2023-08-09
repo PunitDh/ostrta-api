@@ -54,8 +54,8 @@ function forbiddenResponse(message = "Forbidden", code = 403) {
   return new Response(Status.FORBIDDEN, message, code);
 }
 
-function notFoundResponse(message = "Not Found", code = 404) {
-  return new Response(Status.ERROR, message, code);
+function notFoundResponse(message = "Not Found") {
+  return new Response(Status.ERROR, message, 404);
 }
 
 function jwtResponse(payload) {
