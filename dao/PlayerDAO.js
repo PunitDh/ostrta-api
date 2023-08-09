@@ -17,6 +17,12 @@ const PlayerDAO = {
     const { firstName, lastName } = await Player.findById(playerId);
     return { firstName, lastName };
   },
+  findByIdAndUpdate: async function (playerId, update) {
+    const player = await Player.findByIdAndUpdate(playerId, update, {
+      returnDocument: "after",
+    });
+    return player;
+  },
 };
 
 module.exports = PlayerDAO;

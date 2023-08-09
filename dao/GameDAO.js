@@ -19,16 +19,28 @@ const GameDAO = {
     return createdGame;
   },
   resetRounds: async function (gameId) {
-    const game = await Game.findByIdAndUpdate(gameId, { rounds: [new Round()] })
+    const game = await Game.findByIdAndUpdate(
+      gameId,
+      { rounds: [new Round()] },
+      { returnDocument: "after" }
+    )
       .populate("players")
       .exec();
     return game;
   },
   renameGame: async function (gameId, name) {
-    return await Game.findByIdAndUpdate(gameId, { name });
+    return await Game.findByIdAndUpdate(
+      gameId,
+      { name },
+      { returnDocument: "after" }
+    );
   },
   closeGame: async function (gameId) {
-    return await Game.findByIdAndUpdate(gameId, { closed: true });
+    return await Game.findByIdAndUpdate(
+      gameId,
+      { closed: true },
+      { returnDocument: "after" }
+    );
   },
   findByPlayerId: async function (playerId) {
     return await Game.find({

@@ -11,7 +11,7 @@ const gameService = require("./service/GameService");
 const SocketEvent = require("./domain/SocketEvent");
 const { Status, unauthorizedResponse } = require("./domain/Response");
 const { corsOptions } = require("./utils/constants");
-const { isAuthenticated, decodeJWT} = require("./utils");
+const { isAuthenticated, decodeJWT } = require("./utils");
 let io;
 
 app.use(cors(corsOptions));
@@ -44,6 +44,8 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
       typeof callback === "function" ? await callback(request) : request;
     const target = useRoom ? request.gameId : socket.id;
     useRoom && socket.join(target);
+
+    console.log({ event: socketEvent, request, response });
     return io.to(target).emit(socketEvent.response, response);
   };
 

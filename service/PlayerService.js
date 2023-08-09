@@ -50,7 +50,7 @@ const PlayerService = {
   async updateProfile(request) {
     const decoded = decodeJWT(request._jwt);
     if (decoded) {
-      const player = await Player.findByIdAndUpdate(decoded.id, request);
+      const player = await PlayerDAO.findByIdAndUpdate(decoded.id, request);
       return jwtResponse(playerMapper(player));
     }
     return forbiddenResponse();
@@ -88,8 +88,6 @@ const PlayerService = {
       const currentOnlinePlayers = players
         .filter((player) => player.id !== decoded.id)
         .map(playerMapper);
-
-      console.log({ currentOnlinePlayers });
 
       return successResponse(currentOnlinePlayers);
     }
