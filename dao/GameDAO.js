@@ -29,18 +29,23 @@ const GameDAO = {
     return game;
   },
   renameGame: async function (gameId, name) {
-    return await Game.findByIdAndUpdate(
+    const game = await Game.findByIdAndUpdate(
       gameId,
       { name },
       { returnDocument: "after" }
-    );
+    )
+      .populate("players")
+      .exec();
+    return game;
   },
   closeGame: async function (gameId) {
     return await Game.findByIdAndUpdate(
       gameId,
       { closed: true },
       { returnDocument: "after" }
-    );
+    )
+      .populate("players")
+      .exec();
   },
   findByPlayerId: async function (playerId) {
     return await Game.find({

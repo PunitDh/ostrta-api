@@ -20,6 +20,7 @@ class SocketEvent {
   static CURRENT_GAMES = new SocketEvent("get-current-games", "current-games");
   static PLAY_MOVE = new SocketEvent("play-move", "move-played");
   static LOAD_GAME = new SocketEvent("load-game", "game-loaded");
+  static RENAME_GAME = new SocketEvent("rename-game", "game-renamed");
   static RESET_ROUNDS = new SocketEvent("reset-rounds", "rounds-reset");
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 }

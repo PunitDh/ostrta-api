@@ -20,8 +20,9 @@ const GameService = {
     }
   },
 
-  async rename(request) {
+  async renameGame(request) {
     try {
+      console.log({request});
       const game = await GameDAO.renameGame(request.gameId, request.name);
       return successResponse(gameMapper(game));
     } catch (error) {
