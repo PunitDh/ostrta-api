@@ -44,6 +44,7 @@ class GameResponse {
     if (game) {
       this.id = game._id;
       this.name = game.name;
+      this.icon = game.icon;
       this.players = game.players.map(playerMapper);
       this.rounds = game.rounds;
       this.closed = game.closed;

@@ -3,7 +3,7 @@ const {
   successResponse,
   notFoundResponse,
 } = require("../domain/Response");
-const { gameMapper, recentGameMapper } = require("../utils");
+const { gameMapper } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
@@ -22,8 +22,21 @@ const GameService = {
 
   async renameGame(request) {
     try {
-      console.log({request});
-      const game = await GameDAO.renameGame(request.gameId, request.name);
+      const game = await GameDAO.updateGame(request.gameId, {
+        name: request.name,
+      });
+      return successResponse(gameMapper(game));
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
+  async changeIcon(request) {
+    try {
+      console.log({ request });
+      const game = await GameDAO.updateGame(request.gameId, {
+        icon: request.icon,
+      });
       return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error);
@@ -32,7 +45,9 @@ const GameService = {
 
   async resetRounds(request) {
     try {
-      const game = await GameDAO.resetRounds(request.gameId);
+      const game = await GameDAO.updateGame(request.gameId, {
+        rounds: [new Round()],
+      });
       return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error);
@@ -50,7 +65,7 @@ const GameService = {
 
   async close(request) {
     try {
-      const game = await GameDAO.closeGame(request.gameId);
+      const game = await GameDAO.updateGame(request.gameId, { closed: true });
       return successResponse(game);
     } catch (error) {
       return errorResponse(error);

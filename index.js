@@ -44,7 +44,6 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
       typeof callback === "function" ? await callback(request) : request;
     const target = useRoom ? request.gameId : socket.id;
     useRoom && socket.join(target);
-
     console.log({ event: socketEvent, request, response });
     return io.to(target).emit(socketEvent.response, response);
   };
@@ -93,6 +92,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
   securedResponseTo(SocketEvent.RESET_ROUNDS, gameService.resetRounds);
   securedResponseTo(SocketEvent.RECENT_GAMES, gameService.getRecentGames);
   securedResponseTo(SocketEvent.RENAME_GAME, gameService.renameGame);
+  securedResponseTo(SocketEvent.CHANGE_ICON, gameService.changeIcon);
 
   securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
   securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
