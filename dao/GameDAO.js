@@ -51,7 +51,9 @@ const GameDAO = {
     return await Game.find({
       players: playerId,
       closed: false,
-    });
+    })
+      .populate("players")
+      .exec();
   },
   getRecentGames: async function () {
     return await Game.find({ closed: false })
