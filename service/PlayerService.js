@@ -38,6 +38,8 @@ const PlayerService = {
       }
 
       if (bcrypt.compareSync(playerInfo.password, player.password)) {
+        player.isOnline = true;
+        await player.save();
         return jwtResponse(playerMapper(player));
       } else {
         return unauthorizedResponse("Passwords do not match");

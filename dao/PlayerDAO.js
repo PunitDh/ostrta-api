@@ -11,6 +11,7 @@ const PlayerDAO = {
       email: playerInfo.email,
       password: bcrypt.hashSync(playerInfo.password, salt),
       avatar: playerInfo.avatar,
+      isOnline: true,
     });
   },
   getNames: async function (playerId) {

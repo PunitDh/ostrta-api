@@ -33,7 +33,6 @@ const GameService = {
 
   async changeIcon(request) {
     try {
-      console.log({ request });
       const game = await GameDAO.updateGame(request.gameId, {
         icon: request.icon,
       });

@@ -97,7 +97,6 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
   securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
   securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
 
-  // unsecuredResponseTo(SocketEvent.DISCONNECT);
   socket.on("disconnect", async () => {
     await playerService.goOffline(socketMap, socket.id);
   });
