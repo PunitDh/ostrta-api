@@ -17,10 +17,6 @@ const Game = new mongoose.Schema(
       type: Number,
       default: 1,
     },
-    closed: {
-      type: Boolean,
-      default: false,
-    },
     rounds: [
       {
         moves: [

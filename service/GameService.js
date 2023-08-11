@@ -9,6 +9,7 @@ const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
 const PlayerDAO = require("../dao/PlayerDAO");
 const Winner = require("../domain/Winner");
+const Game = require("../models/Game");
 
 const GameService = {
   async createGame(gameInfo) {
@@ -62,10 +63,10 @@ const GameService = {
     }
   },
 
-  async close(request) {
+  async deleteGame(request) {
     try {
-      const game = await GameDAO.updateGame(request.gameId, { closed: true });
-      return successResponse(game);
+      const game = await Game.findByIdAndDelete(request.gameId);
+      return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error);
     }

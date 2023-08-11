@@ -23,6 +23,7 @@ class SocketEvent {
   static RENAME_GAME = new SocketEvent("rename-game", "game-renamed");
   static CHANGE_ICON = new SocketEvent("change-icon", "icon-changed");
   static RESET_ROUNDS = new SocketEvent("reset-rounds", "rounds-reset");
+  static DELETE_GAME = new SocketEvent("delete-game", "game-deleted");
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 }
 

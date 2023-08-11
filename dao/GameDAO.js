@@ -28,18 +28,10 @@ const GameDAO = {
     return game;
   },
   findByPlayerId: async function (playerId) {
-    return await Game.find({
-      players: playerId,
-      closed: false,
-    })
-      .populate("players")
-      .exec();
+    return await Game.find({ players: playerId }).populate("players").exec();
   },
   getRecentGames: async function () {
-    return await Game.find({ closed: false })
-      .sort({ updatedAt: -1 })
-      .populate("players")
-      .exec();
+    return await Game.find().sort({ updatedAt: -1 }).populate("players").exec();
   },
 };
 

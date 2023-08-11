@@ -89,6 +89,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
   securedResponseTo(SocketEvent.CURRENT_GAMES, playerService.getCurrentGames);
   securedResponseTo(SocketEvent.CURRENT_USERS, playerService.getOnlineUsers);
   securedResponseTo(SocketEvent.RESET_ROUNDS, gameService.resetRounds);
+  securedResponseTo(SocketEvent.DELETE_GAME, gameService.deleteGame);
   securedResponseTo(SocketEvent.RECENT_GAMES, gameService.getRecentGames);
   securedResponseTo(SocketEvent.RENAME_GAME, gameService.renameGame);
   securedResponseTo(SocketEvent.CHANGE_ICON, gameService.changeIcon);
