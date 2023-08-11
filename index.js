@@ -44,7 +44,6 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
       typeof callback === "function" ? await callback(request) : request;
     const target = useRoom ? request.gameId : socket.id;
     useRoom && socket.join(target);
-    console.log({ event: socketEvent, request, response });
     return io.to(target).emit(socketEvent.response, response);
   };
 

@@ -14,7 +14,7 @@ const GameService = {
   async createGame(gameInfo) {
     try {
       const game = await GameDAO.createGame(gameInfo);
-      return successResponse(game);
+      return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error.message);
     }

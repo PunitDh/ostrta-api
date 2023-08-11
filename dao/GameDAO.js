@@ -6,16 +6,17 @@ const GameDAO = {
     return await Game.findById(gameId).populate("players").exec();
   },
   createGame: async function (gameInfo) {
-    const games = await Game.find();
+    const games = await Game.countDocuments();
     const game = await Game.create({
-      name: `Game ${games.length + 1}`,
+      name: `Game ${games + 1}`,
       players: gameInfo.players,
       rounds: [new Round()],
+      icon: gameInfo.icon,
     });
-    const createdGame = {
-      name: game.name,
-      id: game.id,
-    };
+    const createdGame = await Game.findById(game._id)
+      .populate("players")
+      .exec();
+
     return createdGame;
   },
   updateGame: async function (gameId, update) {
