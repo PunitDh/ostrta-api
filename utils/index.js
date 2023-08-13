@@ -34,6 +34,7 @@ const playerMapper = (player) => ({
   isOnline: player.isOnline,
   email: player.email,
   avatar: player.avatar,
+  hidden: player.hidden,
   isAdmin: player.isAdmin,
   wins: player.wins,
   losses: player.losses,

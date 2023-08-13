@@ -34,16 +34,21 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
    * @param {SocketEvent} socketEvent
    * @param {Function} callback
    * @param {Object} request
-   * @param {Boolean} useRoom
+   * @param {Boolean} useGameRoom
    * @returns {*}
    */
-  const socketResponse = async (socketEvent, callback, request, useRoom) => {
+  const socketResponse = async (
+    socketEvent,
+    callback,
+    request,
+    useGameRoom
+  ) => {
     const { email } = decodeJWT(request._jwt);
     email && (socketMap[email] = socket.id);
     const response =
       typeof callback === "function" ? await callback(request) : request;
-    const target = useRoom ? request.gameId : socket.id;
-    useRoom && socket.join(target);
+    const target = useGameRoom ? request.gameId : socket.id;
+    useGameRoom && socket.join(target);
     return io.to(target).emit(socketEvent.response, response);
   };
 
@@ -51,15 +56,15 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
    * Unsecured request
    * @param {SocketEvent} socketEvent
    * @param {Function} callback
-   * @param {Boolean} useRoom
+   * @param {Boolean} useGameRoom
    */
   const unsecuredResponseTo = function (
     socketEvent,
     callback,
-    useRoom = false
+    useGameRoom = false
   ) {
     socket.on(socketEvent.request, (request) =>
-      socketResponse(socketEvent, callback, request, useRoom)
+      socketResponse(socketEvent, callback, request, useGameRoom)
     );
   };
 
@@ -67,12 +72,16 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
    * Secured request
    * @param {SocketEvent} socketEvent
    * @param {Function} callback
-   * @param {Boolean} useRoom
+   * @param {Boolean} useGameRoom
    */
-  const securedResponseTo = function (socketEvent, callback, useRoom = false) {
+  const securedResponseTo = function (
+    socketEvent,
+    callback,
+    useGameRoom = false
+  ) {
     socket.on(socketEvent.request, (request) =>
       isAuthenticated(request)
-        ? socketResponse(socketEvent, callback, request, useRoom)
+        ? socketResponse(socketEvent, callback, request, useGameRoom)
         : io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse())
     );
   };
