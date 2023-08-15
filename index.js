@@ -9,9 +9,14 @@ const mongoose = require("./db");
 const playerService = require("./service/PlayerService");
 const gameService = require("./service/GameService");
 const SocketEvent = require("./domain/SocketEvent");
-const { Status, unauthorizedResponse } = require("./domain/Response");
+const {
+  Status,
+  unauthorizedResponse,
+  forbiddenResponse,
+} = require("./domain/Response");
 const { corsOptions } = require("./utils/constants");
-const { isAuthenticated, decodeJWT } = require("./utils");
+const { isAuthenticated, decodeJWT, isAuthorized } = require("./utils");
+const adminService = require("./service/AdminService");
 let io;
 
 app.use(cors(corsOptions));
@@ -38,13 +43,16 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
    * @returns {*}
    */
   const socketResponse = async (
+    secured,
     socketEvent,
     callback,
     request,
     useGameRoom
   ) => {
-    const { email } = decodeJWT(request._jwt);
-    email && (socketMap[email] = socket.id);
+    if (secured) {
+      const { email } = decodeJWT(request._jwt);
+      email && (socketMap[email] = socket.id);
+    }
     const response =
       typeof callback === "function" ? await callback(request) : request;
     const target = useGameRoom ? request.gameId : socket.id;
@@ -64,7 +72,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
     useGameRoom = false
   ) {
     socket.on(socketEvent.request, (request) =>
-      socketResponse(socketEvent, callback, request, useGameRoom)
+      socketResponse(false, socketEvent, callback, request, useGameRoom)
     );
   };
 
@@ -81,12 +89,30 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
   ) {
     socket.on(socketEvent.request, (request) =>
       isAuthenticated(request)
-        ? socketResponse(socketEvent, callback, request, useGameRoom)
+        ? socketResponse(true, socketEvent, callback, request, useGameRoom)
         : io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse())
     );
   };
 
+  const restrictedResponseTo = function (
+    socketEvent,
+    callback,
+    useGameRoom = false
+  ) {
+    socket.on(socketEvent.request, (request) =>
+      isAuthorized(request)
+        ? socketResponse(true, socketEvent, callback, request, useGameRoom)
+        : io.to(socket.id).emit(Status.FORBIDDEN, forbiddenResponse())
+    );
+  };
+
   console.log("New connection started with socket ID: ", socket.id);
+
+  unsecuredResponseTo(SocketEvent.GET_SITE_SETTINGS, adminService.getSettings);
+  restrictedResponseTo(
+    SocketEvent.UPDATE_SITE_SETTINGS,
+    adminService.saveSettings
+  );
 
   unsecuredResponseTo(SocketEvent.REGISTER_USER, playerService.registerPlayer);
   unsecuredResponseTo(SocketEvent.LOGIN_USER, playerService.loginPlayer);

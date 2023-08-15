@@ -22,6 +22,9 @@ const decodeJWT = (jwt) => {
  */
 const isAuthenticated = (request) => Boolean(decodeJWT(request._jwt));
 
+const isAuthorized = (request) => Boolean(decodeJWT(request._jwt).isAdmin);
+
+
 /**
  *
  * @param {Player} player
@@ -86,4 +89,5 @@ module.exports = {
   gameMapper,
   conversationMapper,
   isAuthenticated,
+  isAuthorized
 };

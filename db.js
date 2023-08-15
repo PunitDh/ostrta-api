@@ -2,14 +2,7 @@ const mongoose = require("mongoose");
 
 const connectToDB = () =>
   mongoose
-    .connect(
-      process.env.MONGODB_URL
-      //   {
-      //   tlsAllowInvalidHostnames: true,
-      //   tlsAllowInvalidCertificates: true,
-      //   tlsCertificateKeyFile: "/Users/pxd030/Documents/cafile/IOOF-ROOT.cer",
-      // }
-    )
+    .connect(process.env.MONGODB_URL)
     .then((response) =>
       console.log(
         "Successfully connected to MongoDB cluster:",

@@ -14,6 +14,16 @@ class SocketEvent {
   static UPDATE_PROFILE = new SocketEvent("update-profile", "profile-updated");
   static DELETE_PROFILE = new SocketEvent("delete-profile", "profile-deleted");
 
+  // SITE
+  static GET_SITE_SETTINGS = new SocketEvent(
+    "get-site-settings",
+    "site-settings"
+  );
+  static UPDATE_SITE_SETTINGS = new SocketEvent(
+    "update-site-settings",
+    "site-settings-updated"
+  );
+
   // GAME
   static CREATE_GAME = new SocketEvent("create-game", "game-created");
   static CURRENT_USERS = new SocketEvent("get-current-users", "current-users");
