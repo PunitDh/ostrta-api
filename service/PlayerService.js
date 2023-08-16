@@ -10,15 +10,16 @@ const bcrypt = require("bcrypt");
 const { decodeJWT, playerMapper, gameMapper } = require("../utils");
 const PlayerDAO = require("../dao/PlayerDAO");
 const GameDAO = require("../dao/GameDAO");
+const GameService = require("./GameService");
 
 const PlayerService = {
-  async registerPlayer(playerInfo) {
-    if (playerInfo.password !== playerInfo.confirmPassword) {
+  async registerPlayer(request) {
+    if (request.password !== request.confirmPassword) {
       return errorResponse("Passwords do not match");
     }
 
     try {
-      const player = await PlayerDAO.register(playerInfo);
+      const player = await PlayerDAO.register(request);
       return jwtResponse(playerMapper(player));
     } catch (error) {
       return error.code === 11000
@@ -27,17 +28,17 @@ const PlayerService = {
     }
   },
 
-  async loginPlayer(playerInfo) {
+  async loginPlayer(request) {
     try {
       const player = await Player.findOne({
-        email: playerInfo.email,
+        email: request.email,
       });
 
       if (!player) {
         return unauthorizedResponse("Email address not found");
       }
 
-      if (bcrypt.compareSync(playerInfo.password, player.password)) {
+      if (bcrypt.compareSync(request.password, player.password)) {
         player.isOnline = true;
         await player.save();
         return jwtResponse(playerMapper(player));
@@ -65,7 +66,7 @@ const PlayerService = {
       if (bcrypt.compareSync(request.password, player.password)) {
         const games = await GameDAO.findByPlayerId(decoded.id);
         for (const game of games) {
-          await GameDAO.closeGame(game._id);
+          await GameService.deleteGame(game._id);
         }
         await player.deleteOne();
       }

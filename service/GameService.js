@@ -12,9 +12,9 @@ const Winner = require("../domain/Winner");
 const Game = require("../models/Game");
 
 const GameService = {
-  async createGame(gameInfo) {
+  async createGame(request) {
     try {
-      const game = await GameDAO.createGame(gameInfo);
+      const game = await GameDAO.createGame(request);
       return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error.message);
