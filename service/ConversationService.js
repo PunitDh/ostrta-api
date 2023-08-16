@@ -1,8 +1,23 @@
 const { errorResponse, successResponse } = require("../domain/Response");
-const { conversationMapper } = require("../utils");
+const { conversationMapper, decodeJWT } = require("../utils");
 const ConversationDAO = require("../dao/ConversationDAO");
 
 const ConversationService = {
+  async startConversation(request) {
+    try {
+      const firstPlayer = decodeJWT(request._jwt).id;
+      const secondPlayer = request.player;
+      const conversation = await ConversationDAO.startConversation(
+        firstPlayer,
+        secondPlayer
+      );
+
+      return successResponse(conversationMapper(conversation));
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
   async sendMessage(request) {
     try {
       const conversation = await ConversationDAO.findByPlayers(

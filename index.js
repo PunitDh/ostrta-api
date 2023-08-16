@@ -8,6 +8,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const mongoose = require("./db");
 const playerService = require("./service/PlayerService");
 const gameService = require("./service/GameService");
+const conversationService = require("./service/ConversationService");
 const SocketEvent = require("./domain/SocketEvent");
 const {
   Status,
@@ -131,6 +132,21 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
 
   securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
   securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
+  securedResponseTo(
+    SocketEvent.START_CONVERSATION,
+    conversationService.startConversation
+  );
+
+  socket.on(SocketEvent.SEND_MESSAGE.request, async (request) => {
+    if (!isAuthenticated(request)) {
+      return io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse());
+    }
+
+    const response = await conversationService.sendMessage(request);
+    const target = request.conversationId;
+    socket.join(target);
+    return io.to(target).emit(SocketEvent.SEND_MESSAGE.response, response);
+  });
 
   socket.on("disconnect", async () => {
     await playerService.goOffline(socketMap, socket.id);

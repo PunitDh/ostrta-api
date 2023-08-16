@@ -18,6 +18,10 @@ const Conversation = new mongoose.Schema(
               ref: "Player",
             },
             message: { type: String },
+            read: {
+              type: Boolean,
+              default: false,
+            },
           },
           { timestamps: true }
         ),

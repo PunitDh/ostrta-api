@@ -43,7 +43,9 @@ function createdResponse(payload, code = 201) {
 }
 
 function errorResponse(message, code = 400) {
-  return new Response(Status.ERROR, message, code);
+  const response = new Response(Status.ERROR, message, code);
+  console.log(response);
+  return response;
 }
 
 function unauthorizedResponse(message = "Unauthorized", code = 401) {

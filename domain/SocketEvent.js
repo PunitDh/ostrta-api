@@ -35,6 +35,13 @@ class SocketEvent {
   static RESET_ROUNDS = new SocketEvent("reset-rounds", "rounds-reset");
   static DELETE_GAME = new SocketEvent("delete-game", "game-deleted");
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
+
+  // CONVERSATION
+  static START_CONVERSATION = new SocketEvent(
+    "start-conversation",
+    "conversation-started"
+  );
+  static SEND_MESSAGE = new SocketEvent("send-message", "message-sent");
 }
 
 module.exports = SocketEvent;
