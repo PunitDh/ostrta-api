@@ -3,7 +3,11 @@ const Game = require("../models/Game");
 
 const GameDAO = {
   findByIdAndPopulate: async function (gameId) {
-    return await Game.findById(gameId).populate("players").exec();
+    try {
+      return await Game.findById(gameId).populate("players").exec();
+    } catch {
+      return null;
+    }
   },
   createGame: async function (gameInfo) {
     const games = await Game.countDocuments();

@@ -106,6 +106,17 @@ const PlayerService = {
       await player.save();
     }
   },
+
+  async goOnline(socketMap, socketId) {
+    const email = Object.keys(socketMap).find(
+      (key) => socketMap[key] === socketId
+    );
+    if (email) {
+      const player = await Player.findOne({ email });
+      player.isOnline = true;
+      await player.save();
+    }
+  },
 };
 
 module.exports = PlayerService;

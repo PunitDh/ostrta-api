@@ -53,6 +53,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
     if (secured) {
       const { email } = decodeJWT(request._jwt);
       email && (socketMap[email] = socket.id);
+      await playerService.goOnline(socketMap, socket.id);
     }
     const response =
       typeof callback === "function" ? await callback(request) : request;

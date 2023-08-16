@@ -48,12 +48,12 @@ function errorResponse(message, code = 400) {
   return response;
 }
 
-function unauthorizedResponse(message = "Unauthorized", code = 401) {
-  return new Response(Status.UNAUTHORIZED, message, code);
+function unauthorizedResponse(message = "Unauthorized") {
+  return new Response(Status.UNAUTHORIZED, message, 401);
 }
 
-function forbiddenResponse(message = "Forbidden", code = 403) {
-  return new Response(Status.FORBIDDEN, message, code);
+function forbiddenResponse(message = "Forbidden") {
+  return new Response(Status.FORBIDDEN, message, 401);
 }
 
 function notFoundResponse(message = "Not Found") {
