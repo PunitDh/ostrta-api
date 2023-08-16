@@ -1,12 +1,12 @@
 const Conversation = require("../models/Conversation");
 
 const ConversationDAO = {
-  updateWithMessage: async function (conversationId, message, sender) {
+  updateWithMessage: async function (conversationId, content, sender) {
     const conversation = await Conversation.findById(conversationId)
       .populate("players")
       .exec();
     conversation.messages.push({
-      message,
+      content,
       sender,
     });
     await conversation.save();

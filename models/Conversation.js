@@ -17,7 +17,7 @@ const Conversation = new mongoose.Schema(
               type: mongoose.Schema.Types.ObjectId,
               ref: "Player",
             },
-            message: { type: String },
+            content: { type: String },
             read: {
               type: Boolean,
               default: false,
