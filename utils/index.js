@@ -68,7 +68,7 @@ const gameMapper = (game) => new GameResponse(game);
 class ConversationResponse {
   constructor(conversation) {
     if (conversation) {
-      this.id = conversation._id;
+      this.id = conversation.id || conversation._id;
       this.players = conversation.players.map(playerMapper);
       this.messages = conversation.messages;
     }

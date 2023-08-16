@@ -3,6 +3,17 @@ const { conversationMapper, decodeJWT } = require("../utils");
 const ConversationDAO = require("../dao/ConversationDAO");
 
 const ConversationService = {
+  async getConversations(request) {
+    try {
+      const player = decodeJWT(request._jwt).id;
+      const conversations = await ConversationDAO.findByPlayer(player);
+
+      return successResponse(conversations.map(conversationMapper));
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
   async startConversation(request) {
     try {
       const firstPlayer = decodeJWT(request._jwt).id;

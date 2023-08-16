@@ -40,7 +40,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
    * @param {SocketEvent} socketEvent
    * @param {Function} callback
    * @param {Object} request
-   * @param {Boolean} useGameRoom
+   * @param {Boolean} useRoom
    * @returns {*}
    */
   const socketResponse = async (
@@ -48,7 +48,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
     socketEvent,
     callback,
     request,
-    useGameRoom
+    useRoom
   ) => {
     if (secured) {
       const { email } = decodeJWT(request._jwt);
@@ -57,8 +57,8 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
     }
     const response =
       typeof callback === "function" ? await callback(request) : request;
-    const target = useGameRoom ? request.gameId : socket.id;
-    useGameRoom && socket.join(target);
+    const target = useRoom ? request.gameId : socket.id;
+    useRoom && socket.join(target);
     return io.to(target).emit(socketEvent.response, response);
   };
 
@@ -133,10 +133,43 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
 
   securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
   securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
-  securedResponseTo(
-    SocketEvent.START_CONVERSATION,
-    conversationService.startConversation
-  );
+
+  socket.on(SocketEvent.GET_CONVERSATIONS.request, async (request) => {
+    if (!isAuthenticated(request)) {
+      return io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse());
+    }
+
+    const response = await conversationService.getConversations(request);
+    response.payload.forEach((conversation) => socket.join(conversation.id));
+    // console.log(io.sockets.adapter.rooms);
+    return io
+      .to(socket.id)
+      .emit(SocketEvent.GET_CONVERSATIONS.response, response);
+  });
+
+  // securedResponseTo(
+  //   SocketEvent.START_CONVERSATION,
+  //   conversationService.startConversation,
+  //   "conversationId"
+  // );
+  // securedResponseTo(
+  //   SocketEvent.SEND_MESSAGE,
+  //   conversationService.sendMessage,
+  //   "conversationId"
+  // );
+
+  socket.on(SocketEvent.START_CONVERSATION.request, async (request) => {
+    if (!isAuthenticated(request)) {
+      return io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse());
+    }
+
+    const response = await conversationService.startConversation(request);
+    const target = response.payload.id;
+    socket.join(target);
+    return io
+      .to(target)
+      .emit(SocketEvent.START_CONVERSATION.response, response);
+  });
 
   socket.on(SocketEvent.SEND_MESSAGE.request, async (request) => {
     if (!isAuthenticated(request)) {
@@ -144,7 +177,7 @@ io.on(SocketEvent.CONNECTION.request, (socket) => {
     }
 
     const response = await conversationService.sendMessage(request);
-    const target = request.conversationId;
+    const target = response.payload.id;
     socket.join(target);
     return io.to(target).emit(SocketEvent.SEND_MESSAGE.response, response);
   });

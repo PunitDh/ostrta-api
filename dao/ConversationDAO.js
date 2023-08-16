@@ -14,8 +14,10 @@ const ConversationDAO = {
   },
 
   findByPlayer: async function (playerId) {
-    const conversations = await Conversation.find({ players: playerId });
-    return conversations.populate("players").exec();
+    const conversations = await Conversation.find({ players: playerId })
+      .populate("players")
+      .exec();
+    return conversations;
   },
 
   findByPlayers: async function (receiver, sender) {

@@ -37,6 +37,10 @@ class SocketEvent {
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 
   // CONVERSATION
+  static GET_CONVERSATIONS = new SocketEvent(
+    "get-conversations",
+    "conversations"
+  );
   static START_CONVERSATION = new SocketEvent(
     "start-conversation",
     "conversation-started"
