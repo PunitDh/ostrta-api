@@ -12,16 +12,19 @@ const AdminService = {
       return errorResponse("Something went wrong");
     }
   },
-  saveSettings: async (siteSettings) => {
+  saveSettings: async (request) => {
     try {
-      const settings = await Admin.findByIdAndUpdate(
-        process.env.SITE_SETTINGS_OBJECT_ID,
-        siteSettings,
-        { returnDocument: "after" }
+      const settings = await Admin.findById(
+        process.env.SITE_SETTINGS_OBJECT_ID
       );
+      settings.siteSettings = {
+        ...settings.siteSettings,
+        ...request.siteSettings,
+      };
+      await settings.save();
       return successResponse(settings);
     } catch (error) {
-      return errorResponse("Something went wrong");
+      return errorResponse("Something went wrong", error);
     }
   },
 };
