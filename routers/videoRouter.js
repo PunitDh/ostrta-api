@@ -5,7 +5,7 @@ const fileUpload = multer();
 const videoService = require("../service/VideoService");
 const fileUtils = require("../utils/fileUtils");
 
-router.post("/", fileUpload.single("file"), async (req, res) => {
+router.post("/subtitles/translate", fileUpload.single("file"), async (req, res) => {
   const filename = fileUtils.extractName(req.file.originalname);
   const audioFile = await videoService.extractAudio(req.file, filename);
   const subtitles = await videoService.extractSubtitles(audioFile);
