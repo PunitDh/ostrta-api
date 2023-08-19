@@ -12,8 +12,13 @@ const { isAuthenticated, decodeJWT, isAuthorized } = require("../utils");
 
 const socketMap = {};
 
-module.exports = (io) => {
+module.exports = (io, app) => {
   io.on(SocketEvent.CONNECTION.request, (socket) => {
+    socket.on(SocketEvent.PROGRESS_UPDATE.request, (sessionId) => {
+      socketMap[sessionId] = socket.id;
+      app.set("socketMap", socketMap);
+    });
+
     /**
      *
      * @param {SocketEvent} socketEvent
