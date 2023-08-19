@@ -5,13 +5,15 @@ const Replicate = require("replicate");
 const StorageService = require("./StorageService");
 const axios = require("axios");
 const path = require("path");
+const { v4: uuid } = require("uuid");
 
 const VideoService = {
   extractAudio: async (file, filename) => {
+    const id = uuid().slice(0, 8);
     const videoFileName = `./temp/${file.originalname}`;
     await fs.promises.writeFile(videoFileName, file.buffer);
 
-    const audioFileName = `./temp/${filename}.mp3`;
+    const audioFileName = `./temp/${filename}-${id}.mp3`;
     ffmpeg.setFfmpegPath(ffmpegStatic);
 
     return new Promise((resolve, reject) => {
