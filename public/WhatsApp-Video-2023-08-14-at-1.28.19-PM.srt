@@ -1,3 +1,0 @@
-1
-00:00:00,000 --> 00:00:12,000
-Hola, soy Costa. Soy estudiante aquí en Melbourne, Australia, y te envío este breve mensaje con fines de prueba.
