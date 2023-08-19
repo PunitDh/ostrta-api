@@ -7,59 +7,57 @@ const axios = require("axios");
 const path = require("path");
 
 const VideoService = {
-  extractSubtitles: async (video) => {
-    try {
-      const replicate = new Replicate({
-        auth: process.env.REPLICATE_API_TOKEN,
-      });
-      const file = `./temp/${video.originalname}`;
-      const audioFile = `./temp/audio.mp3`;
+  extractAudio: async (file, filename) => {
+    const videoFileName = `./temp/${file.originalname}`;
+    await fs.promises.writeFile(videoFileName, file.buffer);
 
-      await fs.promises.writeFile(file, video.buffer);
+    const audioFileName = `./temp/${filename}.mp3`;
+    ffmpeg.setFfmpegPath(ffmpegStatic);
 
-      ffmpeg.setFfmpegPath(ffmpegStatic);
+    return new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(videoFileName)
+        .outputOptions("-ab", "192k")
+        .saveToFile(audioFileName)
+        .on("progress", (progress) => {
+          if (progress.percent) {
+            console.log(`Processing: ${Math.floor(progress.percent)}% done`);
+          }
+        })
+        .on("end", () => resolve(audioFileName))
+        .on("error", (error) => reject(error));
+    });
+  },
 
-      ffmpeg().input(file).outputOptions("-ab", "192k").saveToFile(audioFile);
-      // .on("progress", (progress) => {
-      //   if (progress.percent) {
-      //     console.log(`Processing: ${Math.floor(progress.percent)}% done`);
-      //   }
-      // })
-      // .on("end", () => {
-      //   console.log("FFmpeg has finished.");
-      // })
-      // .on("error", (error) => {
-      //   console.error(error);
-      // });
+  extractSubtitles: async (filename) => {
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    });
 
-      const [uploadedFile, uploadedObject] = await StorageService.uploadFile(
-        file
-      ).catch(console.error);
+    const [_, uploadedFile] = await StorageService.uploadFile(filename);
 
-      const { transcription } = await replicate.run(
-        process.env.OPENAI_WHISPER_VERSION,
-        {
-          input: {
-            audio: uploadedObject.mediaLink,
-            model: "large-v2",
-            transcription: "srt",
-            temperature: 0,
-            condition_on_previous_text: true,
-            temperature_increment_on_fallback: 0.2,
-            compression_ratio_threshold: 2.4,
-            logprob_threshold: -1,
-            no_speech_threshold: 0.6,
-          },
-        }
-      );
+    const { transcription } = await replicate.run(
+      process.env.OPENAI_WHISPER_VERSION,
+      {
+        input: {
+          audio: uploadedFile.mediaLink,
+          model: "large-v2",
+          transcription: "srt",
+          temperature: 0,
+          condition_on_previous_text: true,
+          temperature_increment_on_fallback: 0.2,
+          compression_ratio_threshold: 2.4,
+          logprob_threshold: -1,
+          no_speech_threshold: 0.6,
+        },
+      }
+    );
 
-      return transcription;
-    } catch (error) {
-      return console.error(error);
-    }
+    return transcription;
   },
 
   translateSubtitles: async (subtitles, language = "English") => {
+    if (!subtitles) return "No subtitles found";
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -82,17 +80,21 @@ const VideoService = {
     return response.data.choices[0].message.content;
   },
 
-  saveSubtitles: async (subtitles, name) => {
-    const filename = name
-      .split(".")
-      .slice(0, -1)
-      .join(".")
-      .split(" ")
-      .join("-")
-      .concat(".srt");
-    const location = path.join("public", filename);
+  saveSubtitles: async (subtitles, filename) => {
+    const location = path.join("public", filename.concat(".srt"));
     await fs.promises.writeFile(location, subtitles);
     return filename;
+  },
+
+  cleanupTempDir: async () => {
+    const files = (await fs.promises.readdir("./temp")).filter(
+      (file) => file !== ".keep"
+    );
+    for (const file of files) {
+      await fs.promises.rm(`./temp/${file}`);
+      console.log(`Cleaned ./temp/${file}`);
+    }
+    return true;
   },
 };
 

@@ -10,7 +10,8 @@ const StorageService = {
     try {
       const response = await storage
         .bucket(process.env.GCLOUD_STORAGE_BUCKET_NAME)
-        .upload(filePath);
+        .upload(filePath)
+        .catch(console.error);
       return response;
     } catch (error) {
       return console.error(error);

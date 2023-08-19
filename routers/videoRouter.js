@@ -3,17 +3,18 @@ const router = express.Router();
 const multer = require("multer");
 const fileUpload = multer();
 const videoService = require("../service/VideoService");
+const fileUtils = require("../utils/fileUtils");
 
 router.post("/", fileUpload.single("file"), async (req, res) => {
-  const subtitles = await videoService.extractSubtitles(req.file);
+  const filename = fileUtils.extractName(req.file.originalname);
+  const audioFile = await videoService.extractAudio(req.file, filename);
+  const subtitles = await videoService.extractSubtitles(audioFile);
   const translation = await videoService.translateSubtitles(
     subtitles,
     req.body.language
   );
-  const location = await videoService.saveSubtitles(
-    translation,
-    req.file.originalname
-  );
+  const location = await videoService.saveSubtitles(translation, filename);
+  await videoService.cleanupTempDir();
   return res.send({ translation, location });
 });
 
