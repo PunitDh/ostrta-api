@@ -7,10 +7,11 @@ const AppService = {
       (file) => file !== ".keep"
     );
     for (const file of files) {
-      const { birthtime } = fs.statSync(`./public/${file}`);
+      const fileLocation = `./public/${file}`;
+      const { birthtime } = fs.statSync(fileLocation);
       if (new Date().getTime() - birthtime.getTime() > Time.ONE_DAY) {
-        await fs.promises.rm(`./public/${file}`);
-        console.log(`Cleaned ./public/${file}`);
+        await fs.promises.rm(fileLocation);
+        console.log(`Cleaned ${fileLocation}`);
       }
     }
     return true;
