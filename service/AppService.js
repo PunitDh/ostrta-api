@@ -9,7 +9,7 @@ const AppService = {
     for (const file of files) {
       const fileLocation = `./public/${file}`;
       const { birthtime } = fs.statSync(fileLocation);
-      if (new Date().getTime() - birthtime.getTime() > Time.ONE_DAY) {
+      if (Date.now() - birthtime.getTime() > Time.ONE_DAY) {
         await fs.promises.rm(fileLocation);
         console.log(`Cleaned ${fileLocation}`);
       }
