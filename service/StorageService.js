@@ -1,13 +1,8 @@
 const { Storage } = require("@google-cloud/storage");
+const encoder = require("../utils/encoder");
 
 const storage = new Storage({
-  credentials: {
-    type: process.env.GCLOUD_STORAGE_TYPE,
-    private_key: process.env.GCLOUD_STORAGE_PRIVATE_KEY,
-    client_email: process.env.GCLOUD_STORAGE_CLIENT_EMAIL,
-    client_id: process.env.GCLOUD_STORAGE_CLIENT_ID,
-    project_id: process.env.GCLOUD_STORAGE_PROJECT_ID,
-  },
+  credentials: encoder.base64ToJson(process.env.GCLOUD_CREDENTIALS),
 });
 
 const StorageService = {
