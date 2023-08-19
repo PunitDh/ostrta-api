@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -7,10 +8,10 @@ const { corsOptions } = require("./utils/constants");
 const videoRouter = require("./routers/videoRouter");
 const socketHandlers = require("./handlers/socket");
 const io = require("socket.io")(http);
-require("dotenv").config();
 const port = process.env.PORT || 3000;
 
 app.use(cors(corsOptions));
+app.use(express.static("public"));
 app.use("/video", videoRouter);
 
 mongoose.connectToDB();

@@ -8,7 +8,7 @@ const adminService = require("../service/AdminService");
 const conversationService = require("../service/ConversationService");
 const gameService = require("../service/GameService");
 const playerService = require("../service/PlayerService");
-const { isAuthenticated, decodeJWT } = require("../utils");
+const { isAuthenticated, decodeJWT, isAuthorized } = require("../utils");
 
 const socketMap = {};
 
