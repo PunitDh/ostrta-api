@@ -64,7 +64,7 @@ router.post(
 
 //     setTimeout(() => {
 //       return res.send({ translation: "fake data", location: "fake location" });
-//     }, delay + 2000);
+//     }, delay + 1000);
 //   }
 // );
 
