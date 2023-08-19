@@ -92,7 +92,7 @@ const VideoService = {
       .concat(".srt");
     const location = path.join("public", filename);
     await fs.promises.writeFile(location, subtitles);
-    return location;
+    return filename;
   },
 };
 

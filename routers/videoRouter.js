@@ -10,11 +10,11 @@ router.post("/", fileUpload.single("file"), async (req, res) => {
     subtitles,
     req.body.language
   );
-  const savedFile = await videoService.saveSubtitles(
+  const location = await videoService.saveSubtitles(
     translation,
     req.file.originalname
   );
-  return res.send({ translation, savedFile });
+  return res.send({ translation, location });
 });
 
 module.exports = router;
