@@ -83,9 +83,10 @@ const VideoService = {
   },
 
   saveSubtitles: async (subtitles, filename) => {
-    const fullFileName = filename.concat(".srt");
+    const id = Math.random().toString(36).slice(2, 9);
+    const fullFileName = filename.concat(id).concat(".srt");
     const location = path.join("public", fullFileName);
-    await fs.promises.writeFile(location, subtitles);
+    await fs.promises.writeFile(location, subtitles, "utf-8");
     return fullFileName;
   },
 

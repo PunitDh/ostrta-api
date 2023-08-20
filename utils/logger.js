@@ -3,7 +3,9 @@ const path = require("path");
 const { LogType, LogTerminalColor } = require("./constants");
 
 function logMessage(type, color, ...messageFrags) {
-  const parsedMessages = messageFrags.map(frag => typeof frag ==='object' ? JSON.stringify(frag) : frag)
+  const parsedMessages = messageFrags.map((frag) =>
+    typeof frag === "object" ? JSON.stringify(frag) : frag
+  );
   const message = [
     `[${type}]`,
     `[${new Date().toLocaleString()}]:`,
@@ -25,9 +27,9 @@ function logMessage(type, color, ...messageFrags) {
   const logFile = path.join(".", "log", `${process.env.npm_package_name}.log`);
 
   if (!fs.existsSync(logFile)) {
-    fs.writeFileSync(logFile, "");
+    fs.writeFileSync(logFile, "", "utf-8");
   } else {
-    fs.appendFileSync(logFile, `${message}\n`);
+    fs.appendFileSync(logFile, `${message}\n`, "utf-8");
   }
 }
 

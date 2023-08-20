@@ -5,6 +5,7 @@ const fileUpload = multer();
 const videoService = require("../service/VideoService");
 const fileUtils = require("../utils/fileUtils");
 const { PROGRESS_UPDATE } = require("../domain/SocketEvent");
+const LOGGER = require("../utils/logger");
 
 router.post(
   "/subtitles/translate",
@@ -28,10 +29,13 @@ router.post(
     sendProgressUpdate(`Complete!`);
 
     function sendProgressUpdate(update) {
-      io.to(socketMap[req.body.sessionId]).emit(
-        PROGRESS_UPDATE.response,
-        update
-      );
+      LOGGER.info(update);
+      if (socketMap) {
+        io.to(socketMap[req.body.sessionId]).emit(
+          PROGRESS_UPDATE.response,
+          update
+        );
+      }
     }
     return res.send({ translation, location });
   }
