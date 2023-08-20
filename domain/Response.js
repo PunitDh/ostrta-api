@@ -54,7 +54,7 @@ function unauthorizedResponse(message = "Unauthorized") {
 }
 
 function forbiddenResponse(message = "Forbidden") {
-  return new Response(Status.FORBIDDEN, message, 401);
+  return new Response(Status.FORBIDDEN, message, 403);
 }
 
 function notFoundResponse(message = "Not Found") {
