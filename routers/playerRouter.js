@@ -10,9 +10,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  console.log(req.body);
   const player = await PlayerService.loginPlayer(req.body);
-  console.log({ player });
   return res.send(player);
 });
 
@@ -27,7 +25,6 @@ router.get("/chats", secured(), async (req, res) => {
   const chats = await ConversationService.getConversations(
     req.headers.authorization
   );
-  console.log({ chats });
   return res.send(chats);
 });
 
