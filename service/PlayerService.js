@@ -103,8 +103,10 @@ const PlayerService = {
     );
     if (email) {
       const player = await Player.findOne({ email });
-      player.isOnline = false;
-      await player.save();
+      if (player) {
+        player.isOnline = false;
+        await player.save();
+      }
     }
   },
 
