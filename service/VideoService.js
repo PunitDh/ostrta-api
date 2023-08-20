@@ -5,12 +5,11 @@ const Replicate = require("replicate");
 const StorageService = require("./StorageService");
 const axios = require("axios");
 const path = require("path");
-const { v4: uuid } = require("uuid");
 const LOGGER = require("../utils/logger");
 
 const VideoService = {
   extractAudio: async (file, filename) => {
-    const id = uuid().slice(0, 8);
+    const id = Math.random().toString(36).slice(2, 9);
     const videoFileName = `./temp/${file.originalname}`;
     await fs.promises.writeFile(videoFileName, file.buffer);
 
@@ -84,9 +83,10 @@ const VideoService = {
   },
 
   saveSubtitles: async (subtitles, filename) => {
-    const location = path.join("public", filename.concat(".srt"));
+    const fullFileName = filename.concat(".srt");
+    const location = path.join("public", fullFileName);
     await fs.promises.writeFile(location, subtitles);
-    return filename;
+    return fullFileName;
   },
 
   cleanupTempDir: async () => {
