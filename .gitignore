@@ -6,3 +6,4 @@ test.js
 ignore
 temp
 public
+log/*.log

@@ -1,4 +1,5 @@
 const JWT = require("jsonwebtoken");
+const LOGGER = require("../utils/logger");
 
 const Status = {
   SUCCESS: "success",
@@ -44,7 +45,7 @@ function createdResponse(payload, code = 201) {
 
 function errorResponse(message, code = 400) {
   const response = new Response(Status.ERROR, message, code);
-  console.log(response);
+  LOGGER.error(response);
   return response;
 }
 

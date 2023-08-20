@@ -9,6 +9,7 @@ const conversationService = require("../service/ConversationService");
 const gameService = require("../service/GameService");
 const playerService = require("../service/PlayerService");
 const { isAuthenticated, decodeJWT, isAuthorized } = require("../utils");
+const LOGGER = require("../utils/logger");
 
 const socketMap = {};
 
@@ -92,7 +93,7 @@ module.exports = (io, app) => {
       );
     };
 
-    console.log("New connection started with socket ID: ", socket.id);
+    LOGGER.info("New connection started with socket ID: ", socket.id);
 
     unsecuredResponseTo(
       SocketEvent.GET_SITE_SETTINGS,

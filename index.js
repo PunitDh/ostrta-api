@@ -13,6 +13,8 @@ const gamesRouter = require("./routers/gamesRouter");
 const adminRouter = require("./routers/adminRouter");
 const socketHandlers = require("./handlers/socket");
 const AppService = require("./service/AppService");
+const routeLogger = require("./middleware/logger");
+const LOGGER = require("./utils/logger");
 const port = process.env.PORT || 3000;
 
 app.use(cors(corsOptions));
@@ -25,11 +27,15 @@ setInterval(async () => {
 }, Time.ONE_HOUR);
 
 mongoose.connectToDB();
+
 socketHandlers(io, app);
+
 app.set("io", io);
+
+app.use(routeLogger());
 app.use("/player", playerRouter);
 app.use("/video", videoRouter);
 app.use("/games", gamesRouter);
 app.use("/admin", adminRouter);
 
-http.listen(port, () => console.log("Server started on port", port));
+http.listen(port, () => LOGGER.info("Server started on port", port));

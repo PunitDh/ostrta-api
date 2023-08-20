@@ -6,6 +6,7 @@ const StorageService = require("./StorageService");
 const axios = require("axios");
 const path = require("path");
 const { v4: uuid } = require("uuid");
+const LOGGER = require("../utils/logger");
 
 const VideoService = {
   extractAudio: async (file, filename) => {
@@ -94,7 +95,7 @@ const VideoService = {
     );
     for (const file of files) {
       await fs.promises.rm(`./temp/${file}`);
-      console.log(`Cleaned ./temp/${file}`);
+      LOGGER.info(`Cleaned ./temp/${file}`);
     }
     return true;
   },

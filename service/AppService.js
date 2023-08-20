@@ -1,5 +1,6 @@
 const fs = require("fs");
 const { Time } = require("../utils/constants");
+const LOGGER = require("../utils/logger");
 
 const AppService = {
   cleanupPublicDir: async () => {
@@ -11,7 +12,7 @@ const AppService = {
       const { birthtime } = fs.statSync(fileLocation);
       if (Date.now() - birthtime.getTime() > Time.ONE_DAY) {
         await fs.promises.rm(fileLocation);
-        console.log(`Cleaned ${fileLocation}`);
+        LOGGER.info(`Cleaned ${fileLocation}`);
       }
     }
     return true;
