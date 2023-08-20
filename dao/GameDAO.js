@@ -9,20 +9,33 @@ const GameDAO = {
       return null;
     }
   },
-  createGame: async function (gameInfo) {
+
+  createGame: async function (player, opponent, icon) {
+    const existingGame = await Game.findOne({
+      players: { $all: [player, opponent] },
+    })
+      .populate("players")
+      .exec();
+
+    if (existingGame) {
+      return existingGame;
+    }
+
     const games = await Game.countDocuments();
     const game = await Game.create({
       name: `Game ${games + 1}`,
-      players: gameInfo.players,
+      players: [player, opponent],
       rounds: [new Round()],
-      icon: gameInfo.icon,
+      icon,
     });
+
     const createdGame = await Game.findById(game._id)
       .populate("players")
       .exec();
 
     return createdGame;
   },
+
   updateGame: async function (gameId, update) {
     const game = await Game.findByIdAndUpdate(gameId, update, {
       returnDocument: "after",
@@ -31,11 +44,17 @@ const GameDAO = {
       .exec();
     return game;
   },
+
   findByPlayerId: async function (playerId) {
     return await Game.find({ players: playerId }).populate("players").exec();
   },
-  getRecentGames: async function () {
-    return await Game.find().sort({ updatedAt: -1 }).populate("players").exec();
+
+  getRecentGames: async function (limit) {
+    return await Game.find()
+      .limit(limit)
+      .sort({ updatedAt: -1 })
+      .populate("players")
+      .exec();
   },
 };
 

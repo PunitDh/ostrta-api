@@ -5,13 +5,21 @@ const router = express.Router();
 
 router.use(secured());
 
-router.get("/recent", async (_, res) => {
-  const games = await GameService.getRecentGames();
+router.get("/recent", async (req, res) => {
+  const { limit } = req.query;
+  const games = await GameService.getRecentGames(limit);
   return res.send(games);
 });
 
 router.post("/new", async (req, res) => {
-  const game = await GameService.createGame(req.body);
+  console.log(req.body);
+  const game = await GameService.createGame({
+    _jwt: req.headers.authorization,
+    opponent: req.body.opponent,
+    icon: req.body.icon,
+  });
+
+  console.log({game});
   return res.send(game);
 });
 

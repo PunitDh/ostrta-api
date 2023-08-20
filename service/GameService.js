@@ -3,7 +3,7 @@ const {
   successResponse,
   notFoundResponse,
 } = require("../domain/Response");
-const { gameMapper } = require("../utils");
+const { gameMapper, decodeJWT } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
@@ -14,7 +14,8 @@ const Game = require("../models/Game");
 const GameService = {
   async createGame(request) {
     try {
-      const game = await GameDAO.createGame(request);
+      const { id } = decodeJWT(request._jwt);
+      const game = await GameDAO.createGame(id, request.opponent, request.icon);
       return successResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error.message);
@@ -63,9 +64,9 @@ const GameService = {
     }
   },
 
-  async getRecentGames() {
+  async getRecentGames(limit) {
     try {
-      const games = await GameDAO.getRecentGames();
+      const games = await GameDAO.getRecentGames(limit);
       return successResponse(games.map(gameMapper));
     } catch (error) {
       return errorResponse(error);
