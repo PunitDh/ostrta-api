@@ -21,6 +21,15 @@ const GameService = {
     }
   },
 
+  async updateGame(gameId, update) {
+    try {
+      const game = await GameDAO.updateGame(gameId, update);
+      return successResponse(gameMapper(game));
+    } catch (error) {
+      return errorResponse(error);
+    }
+  },
+
   async renameGame(request) {
     try {
       const game = await GameDAO.updateGame(request.gameId, {

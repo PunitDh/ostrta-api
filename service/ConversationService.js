@@ -5,9 +5,8 @@ const ConversationDAO = require("../dao/ConversationDAO");
 const ConversationService = {
   async getConversations(request) {
     try {
-      const player = decodeJWT(request._jwt).id;
-      const conversations = await ConversationDAO.findByPlayer(player);
-
+      const { id } = decodeJWT(request);
+      const conversations = await ConversationDAO.findByPlayer(id);
       return successResponse(conversations.map(conversationMapper));
     } catch (error) {
       return errorResponse(error);
