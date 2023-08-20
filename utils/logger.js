@@ -3,10 +3,11 @@ const path = require("path");
 const { LogType, LogTerminalColor } = require("./constants");
 
 function logMessage(type, color, ...messageFrags) {
+  const parsedMessages = messageFrags.map(frag => typeof frag ==='object' ? JSON.stringify(frag) : frag)
   const message = [
     `[${type}]`,
     `[${new Date().toLocaleString()}]:`,
-    ...messageFrags,
+    ...parsedMessages,
   ].join(" ");
 
   switch (type) {

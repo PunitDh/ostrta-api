@@ -65,7 +65,7 @@ const LogColor = Object.freeze({
   INFO: "lightblue",
   WARN: "yellow",
   SUCCESS: "green",
-  ERROR: "red",
+  ERROR: "tomato",
   QUERY: "cyan",
   TEST: "TEST",
 });

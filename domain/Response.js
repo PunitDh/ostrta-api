@@ -50,15 +50,21 @@ function errorResponse(message, code = 400) {
 }
 
 function unauthorizedResponse(message = "Unauthorized") {
-  return new Response(Status.UNAUTHORIZED, message, 401);
+  const response = new Response(Status.UNAUTHORIZED, message, 401);
+  LOGGER.error(response);
+  return response;
 }
 
 function forbiddenResponse(message = "Forbidden") {
-  return new Response(Status.FORBIDDEN, message, 403);
+  const response = new Response(Status.FORBIDDEN, message, 403);
+  LOGGER.error(response);
+  return response;
 }
 
 function notFoundResponse(message = "Not Found") {
-  return new Response(Status.ERROR, message, 404);
+  const response = new Response(Status.ERROR, message, 404);
+  LOGGER.error(response);
+  return response;
 }
 
 function jwtResponse(payload) {
