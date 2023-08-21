@@ -98,6 +98,12 @@ function convertToMilliseconds(time) {
   return Math.round(milliseconds * 100) / 100;
 }
 
+function convertToSeconds(time) {
+  const [seconds, nanoseconds] = time;
+  const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+  return Math.round(milliseconds * 100) / 100 / 1000;
+}
+
 module.exports = {
   decodeJWT,
   playerMapper,
@@ -107,4 +113,5 @@ module.exports = {
   isAuthorized,
   formatDate,
   convertToMilliseconds,
+  convertToSeconds
 };
