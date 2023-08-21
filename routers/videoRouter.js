@@ -13,7 +13,8 @@ router.post(
   async (req, res) => {
     const io = req.app.get("io");
     const socketMap = req.app.get("socketMap");
-    const filename = fileUtils.extractName(req.file.originalname);
+    const id = Math.random().toString(36).slice(2, 9);
+    const filename = `${fileUtils.extractName(req.file.originalname)}-${id}`;
     sendProgressUpdate("Uploading file...");
     const audioFile = await videoService.extractAudio(req.file, filename);
     sendProgressUpdate("Extracting subtitles...");

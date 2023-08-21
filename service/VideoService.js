@@ -9,12 +9,11 @@ const LOGGER = require("../utils/logger");
 
 const VideoService = {
   extractAudio: async (file, filename, sendProgressUpdate) => {
-    const id = Math.random().toString(36).slice(2, 9);
     const videoFileName = `./temp/${file.originalname}`;
     await fs.promises.writeFile(videoFileName, file.buffer);
 
     sendProgressUpdate("Extracting audio...");
-    const audioFileName = `./temp/${filename}-${id}.mp3`;
+    const audioFileName = `./temp/${filename}.mp3`;
     ffmpeg.setFfmpegPath(ffmpegStatic);
 
     return new Promise((resolve, reject) => {
@@ -84,8 +83,7 @@ const VideoService = {
   },
 
   saveSubtitles: async (subtitles, filename) => {
-    const id = Math.random().toString(36).slice(2, 9);
-    const fullFileName = filename.concat(id).concat(".srt");
+    const fullFileName = filename.concat(".srt");
     const location = path.join("public", fullFileName);
     await fs.promises.writeFile(location, subtitles, "utf-8");
     return fullFileName;
