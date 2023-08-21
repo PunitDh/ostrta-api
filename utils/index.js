@@ -92,6 +92,12 @@ const formatDate = (date) =>
     second: "numeric",
   }).format(date);
 
+function convertToMilliseconds(time) {
+  const [seconds, nanoseconds] = time;
+  const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+  return Math.round(milliseconds * 100) / 100;
+}
+
 module.exports = {
   decodeJWT,
   playerMapper,
@@ -100,4 +106,5 @@ module.exports = {
   isAuthenticated,
   isAuthorized,
   formatDate,
+  convertToMilliseconds,
 };

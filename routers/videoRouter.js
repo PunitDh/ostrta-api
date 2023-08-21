@@ -6,11 +6,13 @@ const videoService = require("../service/VideoService");
 const fileUtils = require("../utils/fileUtils");
 const { PROGRESS_UPDATE } = require("../domain/SocketEvent");
 const LOGGER = require("../utils/logger");
+const { convertToMilliseconds } = require("../utils");
 
 router.post(
   "/subtitles/translate",
   fileUpload.single("file"),
   async (req, res) => {
+    const startTime = process.hrtime();
     const io = req.app.get("io");
     const socketMap = req.app.get("socketMap");
     const id = Math.random().toString(36).slice(2, 9);
@@ -31,7 +33,10 @@ router.post(
     sendProgressUpdate(`Generating subtitles file on server`);
     const location = await videoService.saveSubtitles(translation, filename);
     await videoService.cleanupTempDir();
-    sendProgressUpdate(`Complete!`);
+    const endTime = (
+      convertToMilliseconds(process.hrtime(startTime)) / 1000
+    ).toFixed(2);
+    sendProgressUpdate(`Completed in ${endTime}s`);
 
     function sendProgressUpdate(update) {
       LOGGER.info(update);
@@ -52,23 +57,37 @@ router.post(
 //   async (req, res) => {
 //     const io = req.app.get("io");
 //     const socketMap = req.app.get("socketMap");
-
+//     const startTime = process.hrtime();
 //     let delay = 1000;
 
-//     timedUpdate("Extracting audio...");
-//     timedUpdate("Extracting subtitles...");
-//     timedUpdate(`Translating subtitles into ${req.body.language}`);
-//     timedUpdate(`Generating subtitles file on server`);
-//     timedUpdate(`Cleaning up temporary directory`);
-//     timedUpdate(`Complete!`);
+//     timedFunction(() => sendProgressUpdate("Extracting audio..."));
+//     timedFunction(() => sendProgressUpdate("Extracting subtitles..."));
+//     timedFunction(() =>
+//       sendProgressUpdate(`Translating subtitles into ${req.body.language}`)
+//     );
+//     timedFunction(() =>
+//       sendProgressUpdate(`Generating subtitles file on server`)
+//     );
+//     timedFunction(() => sendProgressUpdate(`Cleaning up temporary directory`));
+//     timedFunction(async () => await videoService.cleanupTempDir());
+//     timedFunction(() =>
+//       sendProgressUpdate(
+//         `Completed in ${(
+//           convertToMilliseconds(process.hrtime(startTime)) / 1000
+//         ).toFixed(2)}s!`
+//       )
+//     );
 
-//     function timedUpdate(update) {
-//       setTimeout(() => sendProgressUpdate(update), delay);
+//     function timedFunction(fn) {
+//       setTimeout(fn, delay);
 //       delay += 1000;
 //     }
 
 //     function sendProgressUpdate(update) {
-//       io.to(socketMap[req.body.sessionId]).emit(PROGRESS_UPDATE.response, update);
+//       io.to(socketMap[req.body.sessionId]).emit(
+//         PROGRESS_UPDATE.response,
+//         update
+//       );
 //     }
 
 //     setTimeout(() => {
