@@ -1,12 +1,11 @@
 const fs = require("fs");
 const { Time } = require("../utils/constants");
 const LOGGER = require("../utils/logger");
+const fileUtils = require("../utils/fileUtils");
 
 const AppService = {
   cleanupPublicDir: async () => {
-    const files = (await fs.promises.readdir("./public")).filter(
-      (file) => file !== ".keep"
-    );
+    const files = await fileUtils.getFiles("./public");
     for (const file of files) {
       const fileLocation = `./public/${file}`;
       const { birthtime } = fs.statSync(fileLocation);
