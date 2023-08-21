@@ -14,7 +14,7 @@ router.post(
     const io = req.app.get("io");
     const socketMap = req.app.get("socketMap");
     const filename = fileUtils.extractName(req.file.originalname);
-    sendProgressUpdate("Extracting audio...");
+    sendProgressUpdate("Uploading file...");
     const audioFile = await videoService.extractAudio(req.file, filename);
     sendProgressUpdate("Extracting subtitles...");
     const subtitles = await videoService.extractSubtitles(audioFile);

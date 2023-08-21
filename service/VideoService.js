@@ -8,14 +8,15 @@ const path = require("path");
 const LOGGER = require("../utils/logger");
 
 const VideoService = {
-  extractAudio: async (file, filename) => {
+    extractAudio: async (file, filename, sendProgressUpdate) => {
     const id = Math.random().toString(36).slice(2, 9);
     const videoFileName = `./temp/${file.originalname}`;
     await fs.promises.writeFile(videoFileName, file.buffer);
 
+    sendProgressUpdate("Extracting audio...");
     const audioFileName = `./temp/${filename}-${id}.mp3`;
     ffmpeg.setFfmpegPath(ffmpegStatic);
-
+    sendProgressUpdate
     return new Promise((resolve, reject) => {
       ffmpeg()
         .input(videoFileName)

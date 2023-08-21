@@ -86,7 +86,7 @@ module.exports = (io, app) => {
     securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
     securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
 
-    socket.on(SocketEvent.GET_CONVERSATIONS.request, async (request) => {
+    socket.on(SocketEvent.JOIN_CHATS.request, async (request) => {
       if (!isAuthenticated(request)) {
         return io
           .to(socket.id)
@@ -94,11 +94,17 @@ module.exports = (io, app) => {
       }
 
       const response = await conversationService.getConversations(request);
+      console.log(response.payload.map((it) => it.id));
       response.payload.forEach((conversation) => socket.join(conversation.id));
-      // console.log(io.sockets.adapter.rooms);
-      return io
-        .to(socket.id)
-        .emit(SocketEvent.GET_CONVERSATIONS.response, response);
+      console.log(io.sockets.adapter.rooms);
+    });
+
+    socket.on(SocketEvent.JOIN_CHAT.request, async (request) => {
+      const conversation = await playerService.getConversation(request);
+      if (conversation) {
+        socket.join(conversation.id);
+      }
+      console.log(io.sockets.adapter.rooms);
     });
 
     socket.on(SocketEvent.START_CONVERSATION.request, async (request) => {
@@ -126,6 +132,7 @@ module.exports = (io, app) => {
       const response = await conversationService.sendMessage(request);
       const target = response.payload.id;
       socket.join(target);
+      console.log(io.sockets.adapter.rooms);
       return io.to(target).emit(SocketEvent.SEND_MESSAGE.response, response);
     });
 

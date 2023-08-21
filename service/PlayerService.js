@@ -11,6 +11,8 @@ const { decodeJWT, playerMapper, gameMapper } = require("../utils");
 const PlayerDAO = require("../dao/PlayerDAO");
 const GameDAO = require("../dao/GameDAO");
 const GameService = require("./GameService");
+const Game = require("../models/Game");
+const ConversationDAO = require("../dao/ConversationDAO");
 
 const PlayerService = {
   async registerPlayer(request) {
@@ -57,6 +59,17 @@ const PlayerService = {
       return jwtResponse(playerMapper(player));
     }
     return forbiddenResponse();
+  },
+
+  async getConversation(request) {
+    const { id: playerId } = decodeJWT(request._jwt);
+    const game = await Game.findById(request.gameId);
+    const opponentId = game.players.find((it) => it != playerId);
+    const conversation = await ConversationDAO.findByPlayers(
+      playerId,
+      opponentId
+    );
+    return conversation;
   },
 
   async deleteProfile(request) {

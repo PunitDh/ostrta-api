@@ -12,14 +12,11 @@ router.get("/recent", async (req, res) => {
 });
 
 router.post("/new", async (req, res) => {
-  console.log(req.body);
   const game = await GameService.createGame({
     _jwt: req.headers.authorization,
     opponent: req.body.opponent,
     icon: req.body.icon,
   });
-
-  console.log({game});
   return res.send(game);
 });
 

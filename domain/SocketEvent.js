@@ -43,7 +43,7 @@ class SocketEvent {
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 
   // CONVERSATION
-  static GET_CONVERSATIONS = new SocketEvent(
+  static JOIN_CHATS = new SocketEvent(
     "get-conversations",
     "conversations"
   );
@@ -51,6 +51,7 @@ class SocketEvent {
     "start-conversation",
     "conversation-started"
   );
+  static JOIN_CHAT = new SocketEvent("join-chat", "chat-joined");
   static SEND_MESSAGE = new SocketEvent("send-message", "message-sent");
 }
 
