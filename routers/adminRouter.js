@@ -23,6 +23,7 @@ router.get("/logs", restricted(), async (_, res) => {
 
   const messages = logs
     .split("\n")
+    .slice(-50)
     .map((message) => ({ color: getMessageColour(message), content: message }));
 
   return res.send(messages);

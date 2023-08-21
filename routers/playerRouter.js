@@ -10,8 +10,8 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const player = await PlayerService.loginPlayer(req.body);
-  return res.send(player);
+  const response = await PlayerService.loginPlayer(req.body);
+  return res.send(response);
 });
 
 router.get("/games", secured(), async (req, res) => {
