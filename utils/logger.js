@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { LogType, LogTerminalColor } = require("./constants");
+const { formatDate } = require(".");
 
 function logMessage(type, color, ...messageFrags) {
   const parsedMessages = messageFrags.map((frag) =>
@@ -8,7 +9,7 @@ function logMessage(type, color, ...messageFrags) {
   );
   const message = [
     `[${type}]`,
-    `[${new Date().toLocaleString()}]:`,
+    `[${formatDate(new Date())}]:`,
     ...parsedMessages,
   ].join(" ");
 

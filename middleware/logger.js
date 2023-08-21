@@ -1,3 +1,4 @@
+const { formatDate } = require("../utils");
 const LOGGER = require("../utils/logger");
 
 function convertToMilliseconds(seconds, nanoseconds) {
@@ -8,15 +9,16 @@ function convertToMilliseconds(seconds, nanoseconds) {
 function routeLogger() {
   return (req, res, next) => {
     const startTime = process.hrtime();
-    const date = new Date().toLocaleString();
-    LOGGER.info("Started", req.method, `"${req.url}"`, "at", date);
+    const date = formatDate(new Date());
+    const url = `"${req.url}"`;
+    LOGGER.info("Started", req.method, url, "at", date);
     res.on("finish", () => {
       const [seconds, nanoseconds] = process.hrtime(startTime);
       const diffTime = convertToMilliseconds(seconds, nanoseconds);
       LOGGER.info(
         "Completed",
         req.method,
-        `"${req.url}"`,
+        url,
         res.statusCode,
         res.statusMessage,
         "in",

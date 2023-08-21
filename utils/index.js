@@ -24,7 +24,6 @@ const isAuthenticated = (request) => Boolean(decodeJWT(request._jwt));
 
 const isAuthorized = (request) => Boolean(decodeJWT(request._jwt).isAdmin);
 
-
 /**
  *
  * @param {Player} player
@@ -83,11 +82,22 @@ class ConversationResponse {
 const conversationMapper = (conversation) =>
   new ConversationResponse(conversation);
 
+const formatDate = (date) =>
+  new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+  }).format(date);
+
 module.exports = {
   decodeJWT,
   playerMapper,
   gameMapper,
   conversationMapper,
   isAuthenticated,
-  isAuthorized
+  isAuthorized,
+  formatDate,
 };
