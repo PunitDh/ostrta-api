@@ -94,9 +94,8 @@ module.exports = (io, app) => {
       }
 
       const response = await conversationService.getConversations(request);
-      console.log(response.payload.map((it) => it.id));
       response.payload.forEach((conversation) => socket.join(conversation.id));
-      console.log(io.sockets.adapter.rooms);
+      // console.log(io.sockets.adapter.rooms);
     });
 
     socket.on(SocketEvent.JOIN_CHAT.request, async (request) => {
@@ -104,7 +103,7 @@ module.exports = (io, app) => {
       if (conversation) {
         socket.join(conversation.id);
       }
-      console.log(io.sockets.adapter.rooms);
+      // console.log(io.sockets.adapter.rooms);
     });
 
     socket.on(SocketEvent.START_CONVERSATION.request, async (request) => {
@@ -132,7 +131,7 @@ module.exports = (io, app) => {
       const response = await conversationService.sendMessage(request);
       const target = response.payload.id;
       socket.join(target);
-      console.log(io.sockets.adapter.rooms);
+      // console.log(io.sockets.adapter.rooms);
       return io.to(target).emit(SocketEvent.SEND_MESSAGE.response, response);
     });
 
