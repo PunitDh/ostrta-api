@@ -16,7 +16,11 @@ router.post(
     const id = Math.random().toString(36).slice(2, 9);
     const filename = `${fileUtils.extractName(req.file.originalname)}-${id}`;
     sendProgressUpdate("Uploading file...");
-    const audioFile = await videoService.extractAudio(req.file, filename);
+    const audioFile = await videoService.extractAudio(
+      req.file,
+      filename,
+      sendProgressUpdate
+    );
     sendProgressUpdate("Extracting subtitles...");
     const subtitles = await videoService.extractSubtitles(audioFile);
     sendProgressUpdate(`Translating subtitles into ${req.body.language}`);

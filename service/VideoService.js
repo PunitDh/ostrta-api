@@ -5,7 +5,6 @@ const Replicate = require("replicate");
 const StorageService = require("./StorageService");
 const axios = require("axios");
 const path = require("path");
-const LOGGER = require("../utils/logger");
 const fileUtils = require("../utils/fileUtils");
 
 const VideoService = {
