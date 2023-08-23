@@ -63,7 +63,7 @@ function forbiddenResponse(message = "Forbidden") {
 
 function notFoundResponse(message = "Not Found") {
   const response = new Response(Status.ERROR, message, 404);
-  LOGGER.error(response);
+  // LOGGER.error(response);
   return response;
 }
 

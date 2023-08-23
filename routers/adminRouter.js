@@ -5,6 +5,7 @@ const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const { LogColor } = require("../utils/constants");
+const { successResponse } = require("../domain/Response");
 
 router.get("/settings", async (_, res) => {
   const settings = await AdminService.getSettings();
@@ -26,7 +27,7 @@ router.get("/logs", restricted(), async (_, res) => {
     .slice(-50)
     .map((message) => ({ color: getMessageColour(message), content: message }));
 
-  return res.send(messages);
+  return res.send(successResponse(messages));
 });
 
 router.put("/settings", restricted(), async (req, res) => {

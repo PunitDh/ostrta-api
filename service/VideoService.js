@@ -5,7 +5,7 @@ const Replicate = require("replicate");
 const StorageService = require("./StorageService");
 const axios = require("axios");
 const path = require("path");
-const fileUtils = require("../utils/fileUtils");
+const fileUtils = require("../utils/file");
 
 const VideoService = {
   extractAudio: async (file, filename, sendProgressUpdate) => {

@@ -2,9 +2,10 @@ const Conversation = require("../models/Conversation");
 
 const ConversationDAO = {
   updateWithMessage: async function (conversationId, content, sender) {
-    const conversation = await Conversation.findById(conversationId)
-      .populate("players")
-      .exec();
+    const conversation = await Conversation.findById(conversationId).populate(
+      "players"
+    );
+
     conversation.messages.push({
       content,
       sender,
@@ -14,9 +15,10 @@ const ConversationDAO = {
   },
 
   findByPlayer: async function (playerId) {
-    const conversations = await Conversation.find({ players: playerId })
-      .populate("players")
-      .exec();
+    const conversations = await Conversation.find({
+      players: playerId,
+    }).populate("players");
+
     return conversations;
   },
 
@@ -30,9 +32,7 @@ const ConversationDAO = {
   startConversation: async function (firstPlayer, secondPlayer) {
     let conversation = await Conversation.findOne({
       players: { $all: [firstPlayer, secondPlayer] },
-    })
-      .populate("players")
-      .exec();
+    }).populate("players");
 
     if (conversation) {
       return conversation;
@@ -42,9 +42,10 @@ const ConversationDAO = {
       players: [firstPlayer, secondPlayer],
       messages: [],
     });
-    const createdConversation = await Conversation.findById(conversation._id)
-      .populate("players")
-      .exec();
+    const createdConversation = await Conversation.findById(
+      conversation._id
+    ).populate("players");
+
     return createdConversation;
   },
 };

@@ -4,7 +4,7 @@ const Game = require("../models/Game");
 const GameDAO = {
   findByIdAndPopulate: async function (gameId) {
     try {
-      return await Game.findById(gameId).populate("players").exec();
+      return await Game.findById(gameId).populate("players");
     } catch {
       return null;
     }
@@ -13,9 +13,7 @@ const GameDAO = {
   createGame: async function (player, opponent, icon) {
     const existingGame = await Game.findOne({
       players: { $all: [player, opponent] },
-    })
-      .populate("players")
-      .exec();
+    }).populate("players");
 
     if (existingGame) {
       return existingGame;
@@ -29,9 +27,7 @@ const GameDAO = {
       icon,
     });
 
-    const createdGame = await Game.findById(game._id)
-      .populate("players")
-      .exec();
+    const createdGame = await Game.findById(game._id).populate("players");
 
     return createdGame;
   },
@@ -39,22 +35,20 @@ const GameDAO = {
   updateGame: async function (gameId, update) {
     const game = await Game.findByIdAndUpdate(gameId, update, {
       returnDocument: "after",
-    })
-      .populate("players")
-      .exec();
+    }).populate("players");
+
     return game;
   },
 
   findByPlayerId: async function (playerId) {
-    return await Game.find({ players: playerId }).populate("players").exec();
+    return await Game.find({ players: playerId }).populate("players");
   },
 
   getRecentGames: async function (limit) {
     return await Game.find()
       .limit(limit)
       .sort({ updatedAt: -1 })
-      .populate("players")
-      .exec();
+      .populate("players");
   },
 };
 

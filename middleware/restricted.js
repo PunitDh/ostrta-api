@@ -1,5 +1,5 @@
 const { forbiddenResponse } = require("../domain/Response");
-const { isAuthorized } = require("../utils");
+const { isAuthorized } = require("../utils/security");
 
 module.exports = () => (req, res, next) =>
   isAuthorized({ _jwt: req.headers.authorization })

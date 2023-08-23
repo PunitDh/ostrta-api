@@ -8,8 +8,12 @@ const adminService = require("../service/AdminService");
 const conversationService = require("../service/ConversationService");
 const gameService = require("../service/GameService");
 const playerService = require("../service/PlayerService");
-const { isAuthenticated, decodeJWT, isAuthorized } = require("../utils");
 const LOGGER = require("../utils/logger");
+const {
+  decodeJWT,
+  isAuthenticated,
+  isAuthorized,
+} = require("../utils/security");
 
 const socketMap = {};
 
@@ -94,15 +98,13 @@ module.exports = (io, app) => {
       }
 
       const response = await conversationService.getConversations(request);
-      response.payload.forEach((conversation) => socket.join(conversation.id));
+      response.payload?.forEach((conversation) => socket.join(conversation.id));
       // console.log(io.sockets.adapter.rooms);
     });
 
     socket.on(SocketEvent.JOIN_CHAT.request, async (request) => {
       const conversation = await playerService.getConversation(request);
-      if (conversation) {
-        socket.join(conversation.id);
-      }
+      conversation && socket.join(conversation.id);
       // console.log(io.sockets.adapter.rooms);
     });
 

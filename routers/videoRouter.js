@@ -3,10 +3,11 @@ const router = express.Router();
 const multer = require("multer");
 const fileUpload = multer();
 const videoService = require("../service/VideoService");
-const fileUtils = require("../utils/fileUtils");
+const fileUtils = require("../utils/file");
 const { PROGRESS_UPDATE } = require("../domain/SocketEvent");
 const LOGGER = require("../utils/logger");
 const { convertToSeconds } = require("../utils");
+const { successResponse } = require("../domain/Response");
 
 router.post(
   "/subtitles/translate",
@@ -45,7 +46,7 @@ router.post(
         );
       }
     }
-    return res.send({ translation, location });
+    return res.send(successResponse({ translation, location }));
   }
 );
 
@@ -89,7 +90,9 @@ router.post(
 //     }
 
 //     setTimeout(() => {
-//       return res.send({ translation: "fake data", location: "fake location" });
+//       return res.send(
+//         successResponse({ translation: "fake data", location: "fake location" })
+//       );
 //     }, delay + 1000);
 //   }
 // );

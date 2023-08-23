@@ -7,6 +7,7 @@ function routeLogger() {
     const date = formatDate(new Date());
     const url = `"${req.url}"`;
     LOGGER.info("Started", req.method, url, "at", date);
+
     res.on("finish", () => {
       const endTime = process.hrtime(startTime);
       const diffTime = convertToMilliseconds(endTime);
@@ -21,6 +22,7 @@ function routeLogger() {
         "ms"
       );
     });
+
     next();
   };
 }

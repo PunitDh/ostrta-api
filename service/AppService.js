@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { Time } = require("../utils/constants");
 const LOGGER = require("../utils/logger");
-const fileUtils = require("../utils/fileUtils");
+const fileUtils = require("../utils/file");
 
 const AppService = {
   cleanupPublicDir: async () => {

@@ -3,13 +3,14 @@ const {
   successResponse,
   notFoundResponse,
 } = require("../domain/Response");
-const { gameMapper, decodeJWT } = require("../utils");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
 const GameDAO = require("../dao/GameDAO");
 const PlayerDAO = require("../dao/PlayerDAO");
 const Winner = require("../domain/Winner");
 const Game = require("../models/Game");
+const { gameMapper } = require("../utils/mapper");
+const { decodeJWT } = require("../utils/security");
 
 const GameService = {
   async createGame(request) {
@@ -91,7 +92,6 @@ const GameService = {
 
   async playMove(request) {
     const game = await GameDAO.findByIdAndPopulate(request.gameId);
-
     const move = {
       player: request.playerId,
       move: request.move,

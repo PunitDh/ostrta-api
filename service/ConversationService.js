@@ -1,6 +1,7 @@
 const { errorResponse, successResponse } = require("../domain/Response");
-const { conversationMapper, decodeJWT } = require("../utils");
 const ConversationDAO = require("../dao/ConversationDAO");
+const { conversationMapper } = require("../utils/mapper");
+const { decodeJWT } = require("../utils/security");
 
 const ConversationService = {
   async getConversations(request) {
