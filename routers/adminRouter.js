@@ -14,19 +14,29 @@ router.get("/settings", async (_, res) => {
 
 router.get("/logs", restricted(), async (req, res) => {
   const logFile = path.join(".", "log", `${process.env.npm_package_name}.log`);
-  const { limit } = req.query;
+  const { limit, type } = req.query;
   const logs = await fs.promises.readFile(logFile, "utf-8");
-  const getMessageColour = (message) => {
+
+  const getType = (message) => {
     const bracketOpenIndex = message.indexOf("[");
     const bracketCloseIndex = message.indexOf("]");
-    const type = message.slice(bracketOpenIndex + 1, bracketCloseIndex);
-    return LogColor[type];
+    return message.slice(bracketOpenIndex + 1, bracketCloseIndex).toUpperCase();
+  };
+
+  const createMessage = (message) => {
+    const type = getType(message);
+    return {
+      color: LogColor[type],
+      content: message,
+      type,
+    };
   };
 
   const messages = logs
     .split("\n")
+    .filter((message) => type === "ALL" || type === getType(message))
     .slice(-limit)
-    .map((message) => ({ color: getMessageColour(message), content: message }));
+    .map(createMessage);
 
   return res.send(successResponse(messages));
 });
