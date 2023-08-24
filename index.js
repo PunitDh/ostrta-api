@@ -11,9 +11,10 @@ const videoRouter = require("./routers/videoRouter");
 const playerRouter = require("./routers/playerRouter");
 const gamesRouter = require("./routers/gamesRouter");
 const adminRouter = require("./routers/adminRouter");
-const socketHandlers = require("./handlers/socket");
+const aiRouter = require("./routers/aiRouter");
+const socketHandlers = require("./handlers/SocketHandler");
 const AppService = require("./service/AppService");
-const routeLogger = require("./middleware/logger");
+const routeLogger = require("./middleware/routeLogger");
 const LOGGER = require("./utils/logger");
 const port = process.env.PORT || 3000;
 
@@ -33,9 +34,11 @@ socketHandlers(io, app);
 app.set("io", io);
 
 app.use(routeLogger());
+
+app.use("/admin", adminRouter);
+app.use("/ai", aiRouter);
+app.use("/games", gamesRouter);
 app.use("/player", playerRouter);
 app.use("/video", videoRouter);
-app.use("/games", gamesRouter);
-app.use("/admin", adminRouter);
 
 http.listen(port, () => LOGGER.info("Server started on port", port));

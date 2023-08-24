@@ -16,23 +16,28 @@ router.post(
     const startTime = process.hrtime();
     const io = req.app.get("io");
     const socketMap = req.app.get("socketMap");
-    const id = Math.random().toString(36).slice(2, 9);
-    const filename = `${fileUtils.extractName(req.file.originalname)}-${id}`;
+    const fileId = Math.random().toString(36).slice(2, 9);
+    const outputFilename = `${fileUtils.extractName(
+      req.file.originalname
+    )}-${fileId}`;
     sendProgressUpdate("Uploading file...");
     const audioFile = await videoService.extractAudio(
       req.file,
-      filename,
+      outputFilename,
       sendProgressUpdate
     );
     sendProgressUpdate("Extracting subtitles...");
     const subtitles = await videoService.extractSubtitles(audioFile);
-    sendProgressUpdate(`Translating subtitles into ${req.body.language}`);
+    sendProgressUpdate(`Translating subtitles into '${req.body.language}'`);
     const translation = await videoService.translateSubtitles(
       subtitles,
       req.body.language
     );
     sendProgressUpdate(`Generating subtitles file on server`);
-    const location = await videoService.saveSubtitles(translation, filename);
+    const location = await videoService.saveSubtitles(
+      translation,
+      outputFilename
+    );
     await videoService.cleanupTempDir();
     const endTime = convertToSeconds(process.hrtime(startTime)).toFixed(2);
     sendProgressUpdate(`Completed in ${endTime}s`);
