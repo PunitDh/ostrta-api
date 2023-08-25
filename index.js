@@ -36,8 +36,8 @@ app.set("io", io);
 app.use(routeLogger());
 
 app.use("/admin", adminRouter);
-app.use("/gpt", gptRouter);
 app.use("/games", gamesRouter);
+app.use("/gpt", gptRouter);
 app.use("/player", playerRouter);
 app.use("/video", videoRouter);
 

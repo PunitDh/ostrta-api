@@ -77,19 +77,28 @@ const PlayerService = {
   },
 
   async deleteProfile(request) {
-    const decoded = decodeJWT(request._jwt);
-    if (decoded) {
+    try {
+      const decoded = decodeJWT(request._jwt);
       const player = await Player.findById(decoded.id);
-      if (bcrypt.compareSync(request.password, player.password)) {
-        const games = await GameDAO.findByPlayerId(decoded.id);
-        for (const game of games) {
-          await GameService.deleteGame(game._id);
-        }
-        await player.deleteOne();
+
+      if (!player) return unauthorizedResponse("Invalid player");
+
+      if (!bcrypt.compareSync(request.password, player.password)) {
+        return unauthorizedResponse("Passwords do not match");
       }
-      return playerMapper(player);
+
+      const games = await GameDAO.findByPlayerId(decoded.id);
+
+      for (const game of games) {
+        await GameService.deleteGame(game._id);
+      }
+
+      await player.deleteOne();
+
+      return successResponse(playerMapper(player));
+    } catch (error) {
+      return errorResponse("An error occurred while deleting the profile");
     }
-    return forbiddenResponse();
   },
 
   async getCurrentGames(request) {

@@ -6,7 +6,7 @@ const { decodeJWT } = require("../utils/security");
 const ConversationService = {
   async getConversations(request) {
     try {
-      const { id } = decodeJWT(request);
+      const { id } = decodeJWT(request._jwt);
       const conversations = await ConversationDAO.findByPlayer(id);
       return successResponse(conversations.map(conversationMapper));
     } catch (error) {
@@ -16,7 +16,7 @@ const ConversationService = {
 
   async startConversation(request) {
     try {
-      const firstPlayer = decodeJWT(request._jwt).id;
+      const { id: firstPlayer } = decodeJWT(request._jwt);
       const secondPlayer = request.player;
       const conversation = await ConversationDAO.startConversation(
         firstPlayer,

@@ -44,7 +44,10 @@ router.put("/", secured(), async (req, res) => {
 });
 
 router.delete("/", secured(), async (req, res) => {
-  const player = await PlayerService.deleteProfile(req.body);
+  const player = await PlayerService.deleteProfile({
+    password: req.body.password,
+    _jwt: req.headers.authorization,
+  });
   return res.send(player);
 });
 

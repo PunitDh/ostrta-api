@@ -50,6 +50,7 @@ const LogType = Object.freeze({
   ERROR: "ERROR",
   QUERY: "QUERY",
   TEST: "TEST",
+  UNKNOWN: "UNKNOWN"
 });
 
 const LogTerminalColor = Object.freeze({

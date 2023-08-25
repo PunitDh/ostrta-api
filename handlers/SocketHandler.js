@@ -1,6 +1,6 @@
 const {
-  unauthorizedResponse,
   Status,
+  unauthorizedResponse,
   forbiddenResponse,
 } = require("../domain/Response");
 const SocketEvent = require("../domain/SocketEvent");
@@ -36,9 +36,9 @@ module.exports = (io, app) => {
       const { email } = decodeJWT(request._jwt);
       email && (socketMap[email] = socket.id);
       await playerService.goOnline(socketMap, socket.id);
-
       const response =
         typeof callback === "function" ? await callback(request) : request;
+
       const target = useRoom ? request.gameId : socket.id;
       useRoom && socket.join(target);
       return io.to(target).emit(socketEvent.response, response);
@@ -91,15 +91,12 @@ module.exports = (io, app) => {
     securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
 
     socket.on(SocketEvent.JOIN_CHATS.request, async (request) => {
-      if (!isAuthenticated(request)) {
-        return io
-          .to(socket.id)
-          .emit(Status.UNAUTHORIZED, unauthorizedResponse());
-      }
-
       const response = await conversationService.getConversations(request);
-      response.payload?.forEach((conversation) => socket.join(conversation.id));
-      // console.log(io.sockets.adapter.rooms);
+      console.log("Here", response.payload);
+      Array.isArray(response.payload) &&
+        response.payload.forEach((conversation) =>
+          socket.join(conversation.id)
+        );
     });
 
     socket.on(SocketEvent.JOIN_CHAT.request, async (request) => {

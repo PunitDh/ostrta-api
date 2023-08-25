@@ -1,5 +1,6 @@
 const JWT = require("jsonwebtoken");
 const LOGGER = require("../utils/logger");
+const { convertToMilliseconds } = require("../utils");
 
 const Status = {
   SUCCESS: "success",
@@ -16,10 +17,12 @@ class Response {
    * @param {any} payload
    * @param {Number} code
    */
-  constructor(status, payload, code) {
+  constructor(status, payload, code, hrtime) {
     this.status = status;
     this.payload = payload;
     this.code = code;
+    if (hrtime)
+      this._processTimeMs = convertToMilliseconds(process.hrtime(hrtime));
   }
 
   isError() {
@@ -35,8 +38,8 @@ class Response {
   }
 }
 
-function successResponse(payload, code = 200) {
-  return new Response(Status.SUCCESS, payload, code);
+function successResponse(payload, hrtime, code = 200) {
+  return new Response(Status.SUCCESS, payload, code, hrtime);
 }
 
 function createdResponse(payload, code = 201) {
@@ -83,4 +86,5 @@ module.exports = {
   notFoundResponse,
   jwtResponse,
   Status,
+  Response
 };
