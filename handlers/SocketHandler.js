@@ -92,7 +92,6 @@ module.exports = (io, app) => {
 
     socket.on(SocketEvent.JOIN_CHATS.request, async (request) => {
       const response = await conversationService.getConversations(request);
-      console.log("Here", response.payload);
       Array.isArray(response.payload) &&
         response.payload.forEach((conversation) =>
           socket.join(conversation.id)
@@ -106,12 +105,6 @@ module.exports = (io, app) => {
     });
 
     socket.on(SocketEvent.START_CONVERSATION.request, async (request) => {
-      if (!isAuthenticated(request)) {
-        return io
-          .to(socket.id)
-          .emit(Status.UNAUTHORIZED, unauthorizedResponse());
-      }
-
       const response = await conversationService.startConversation(request);
       const target = response.payload.id;
       socket.join(target);
@@ -121,12 +114,6 @@ module.exports = (io, app) => {
     });
 
     socket.on(SocketEvent.SEND_MESSAGE.request, async (request) => {
-      if (!isAuthenticated(request)) {
-        return io
-          .to(socket.id)
-          .emit(Status.UNAUTHORIZED, unauthorizedResponse());
-      }
-
       const response = await conversationService.sendMessage(request);
       const target = response.payload.id;
       socket.join(target);

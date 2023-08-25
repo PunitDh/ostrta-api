@@ -43,16 +43,14 @@ class SocketEvent {
   static RECENT_GAMES = new SocketEvent("get-recent-games", "recent-games");
 
   // CONVERSATION
-  static JOIN_CHATS = new SocketEvent(
-    "get-conversations",
-    "conversations"
-  );
+  static JOIN_CHATS = new SocketEvent("get-conversations", "conversations");
   static START_CONVERSATION = new SocketEvent(
     "start-conversation",
     "conversation-started"
   );
   static JOIN_CHAT = new SocketEvent("join-chat", "chat-joined");
   static SEND_MESSAGE = new SocketEvent("send-message", "message-sent");
+  static MARK_AS_READ = new SocketEvent("mark-as-read", "marked-as-read");
 }
 
 module.exports = SocketEvent;

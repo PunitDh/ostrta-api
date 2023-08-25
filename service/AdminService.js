@@ -1,5 +1,10 @@
+const fs = require("fs");
+const path = require("path");
 const { errorResponse, successResponse } = require("../domain/Response");
 const Admin = require("../models/Setting");
+const LogDAO = require("../dao/LogDAO");
+
+const logFile = path.join(".", "log", `${process.env.npm_package_name}.log`);
 
 const AdminService = {
   getSettings: async () => {
@@ -12,6 +17,7 @@ const AdminService = {
       return errorResponse("Something went wrong");
     }
   },
+
   saveSettings: async (request) => {
     try {
       const settings = await Admin.findById(
@@ -26,6 +32,16 @@ const AdminService = {
     } catch (error) {
       return errorResponse("Something went wrong", error);
     }
+  },
+
+  getLogs: async (limit, type) => {
+    const messages = await LogDAO.retrieveLogs(type, limit);
+    return successResponse(messages);
+  },
+
+  clearLogs: async () => {
+    const messages = await LogDAO.clearLogs();
+    return successResponse(messages);
   },
 };
 

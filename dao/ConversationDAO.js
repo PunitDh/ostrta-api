@@ -10,6 +10,7 @@ const ConversationDAO = {
       content,
       sender,
     });
+
     await conversation.save();
     return conversation;
   },
@@ -42,6 +43,7 @@ const ConversationDAO = {
       players: [firstPlayer, secondPlayer],
       messages: [],
     });
+
     const createdConversation = await Conversation.findById(
       conversation._id
     ).populate("players");
