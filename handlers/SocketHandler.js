@@ -17,7 +17,7 @@ const {
 
 const socketMap = {};
 
-module.exports = (io, app) => {
+module.exports = function (io, app) {
   io.on(SocketEvent.CONNECTION.request, (socket) => {
     socket.on(SocketEvent.PROGRESS_UPDATE.request, (request) => {
       socketMap[request.sessionId] = socket.id;

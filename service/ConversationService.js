@@ -1,4 +1,8 @@
-const { errorResponse, successResponse } = require("../domain/Response");
+const {
+  errorResponse,
+  successResponse,
+  createdResponse,
+} = require("../domain/Response");
 const ConversationDAO = require("../dao/ConversationDAO");
 const { conversationMapper } = require("../utils/mapper");
 const { decodeJWT } = require("../utils/security");
@@ -52,7 +56,7 @@ const ConversationService = {
         sender.id
       );
 
-      return successResponse(conversationMapper(newConversation));
+      return createdResponse(conversationMapper(newConversation));
     } catch (error) {
       return errorResponse(error);
     }

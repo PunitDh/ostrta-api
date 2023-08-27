@@ -1,10 +1,6 @@
-const fs = require("fs");
-const path = require("path");
 const { errorResponse, successResponse } = require("../domain/Response");
 const Admin = require("../models/Setting");
 const LogDAO = require("../dao/LogDAO");
-
-const logFile = path.join(".", "log", `${process.env.npm_package_name}.log`);
 
 const AdminService = {
   getSettings: async () => {

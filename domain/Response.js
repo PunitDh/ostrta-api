@@ -5,6 +5,7 @@ const { convertToMilliseconds } = require("../utils");
 const Status = {
   SUCCESS: "success",
   CREATED: "created",
+  NO_CONTENT: "no content",
   ERROR: "error",
   UNAUTHORIZED: "unauthorized",
   FORBIDDEN: "forbidden",
@@ -46,6 +47,10 @@ function createdResponse(payload, code = 201) {
   return new Response(Status.CREATED, payload, code);
 }
 
+function noContentResponse(payload, code = 204) {
+  return new Response(Status.SUCCESS, payload, code);
+}
+
 function errorResponse(message, code = 400) {
   const response = new Response(Status.ERROR, message, code);
   LOGGER.error(response);
@@ -74,7 +79,7 @@ function jwtResponse(payload) {
   const jwt = JWT.sign(payload, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
-  return successResponse(jwt);
+  return createdResponse(jwt);
 }
 
 module.exports = {
@@ -84,7 +89,8 @@ module.exports = {
   unauthorizedResponse,
   forbiddenResponse,
   notFoundResponse,
+  noContentResponse,
   jwtResponse,
   Status,
-  Response
+  Response,
 };
