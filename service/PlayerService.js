@@ -143,9 +143,11 @@ const PlayerService = {
     );
     if (email) {
       const player = await Player.findOne({ email });
-      player.isOnline = true;
-      await player.save();
-      return successResponse(playerMapper(player));
+      if (player) {
+        player.isOnline = true;
+        await player.save();
+        return successResponse(playerMapper(player));
+      }
     }
   },
 };
