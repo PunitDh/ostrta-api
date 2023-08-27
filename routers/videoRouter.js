@@ -59,6 +59,7 @@ router.post(
 
       function sendProgressUpdate(update) {
         if (typeof socketMap === "object") {
+          LOGGER.info(update);
           io.to(socketMap[req.body.sessionId]).emit(
             PROGRESS_UPDATE.response,
             update
