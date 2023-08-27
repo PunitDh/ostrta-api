@@ -1,10 +1,12 @@
 const Conversation = require("../models/Conversation");
 
 const ConversationDAO = {
+  findById: async function (conversationId) {
+    return await Conversation.findById(conversationId).populate("players");
+  },
+
   updateWithMessage: async function (conversationId, content, sender) {
-    const conversation = await Conversation.findById(conversationId).populate(
-      "players"
-    );
+    const conversation = await ConversationDAO.findById(conversationId);
 
     conversation.messages.push({
       content,
@@ -15,10 +17,21 @@ const ConversationDAO = {
     return conversation;
   },
 
+  markAsRead: async function (conversationId, player) {
+    const conversation = await ConversationDAO.findById(conversationId);
+    conversation.messages
+      .filter((message) => !message.read && message.sender != player)
+      .forEach((message) => {
+        message.read = true;
+      });
+    await conversation.save();
+    return conversation;
+  },
+
   findByPlayer: async function (playerId) {
     const conversations = await Conversation.find({
       players: playerId,
-    }).populate("players");
+    });
 
     return conversations;
   },
@@ -44,9 +57,9 @@ const ConversationDAO = {
       messages: [],
     });
 
-    const createdConversation = await Conversation.findById(
+    const createdConversation = await ConversationDAO.findById(
       conversation._id
-    ).populate("players");
+    );
 
     return createdConversation;
   },

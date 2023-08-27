@@ -27,8 +27,7 @@ const GameDAO = {
       icon,
     });
 
-    const createdGame = await Game.findById(game._id).populate("players");
-
+    const createdGame = await GameDAO.findByIdAndPopulate(game._id);
     return createdGame;
   },
 

@@ -31,16 +31,17 @@ const ConversationService = {
 
   async sendMessage(request) {
     try {
+      const sender = decodeJWT(request._jwt);
       const conversation = await ConversationDAO.findByPlayers(
         request.receiver,
-        request.sender
+        sender.id
       );
 
       if (conversation) {
         const updatedConversation = await ConversationDAO.updateWithMessage(
           conversation._id,
           request.message,
-          request.sender
+          sender.id
         );
         return successResponse(conversationMapper(updatedConversation));
       }
@@ -48,13 +49,23 @@ const ConversationService = {
       const newConversation = await ConversationDAO.createNewConversation(
         request.players,
         request.message,
-        request.sender
+        sender.id
       );
 
       return successResponse(conversationMapper(newConversation));
     } catch (error) {
       return errorResponse(error);
     }
+  },
+
+  async markAsRead(request) {
+    const decoded = decodeJWT(request._jwt);
+    const conversation = await ConversationDAO.markAsRead(
+      request.conversationId,
+      decoded.id
+    );
+
+    return successResponse(conversationMapper(conversation));
   },
 };
 

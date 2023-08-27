@@ -35,12 +35,16 @@ module.exports = (io, app) => {
     const socketResponse = async (socketEvent, callback, request, useRoom) => {
       const { email } = decodeJWT(request._jwt);
       email && (socketMap[email] = socket.id);
-      await playerService.goOnline(socketMap, socket.id);
+      const player = await playerService.goOnline(socketMap, socket.id);
+      if (player) {
+        io.emit("online-status-changed", player);
+      }
       const response =
         typeof callback === "function" ? await callback(request) : request;
 
       const target = useRoom ? request.gameId : socket.id;
       useRoom && socket.join(target);
+
       return io.to(target).emit(socketEvent.response, response);
     };
 
@@ -74,6 +78,21 @@ module.exports = (io, app) => {
       );
     };
 
+    const securedJoinResponseTo = async function (socketEvent, callback) {
+      socket.on(socketEvent.request, async (request) => {
+        if (isAuthenticated(request)) {
+          const response = await callback(request);
+          const target = response.payload.id;
+          socket.join(target);
+          return io.to(target).emit(socketEvent.response, response);
+        } else {
+          return io
+            .to(socket.id)
+            .emit(Status.UNAUTHORIZED, unauthorizedResponse());
+        }
+      });
+    };
+
     LOGGER.info("New connection started with socket ID: ", socket.id);
 
     restrictedResponseTo(
@@ -90,6 +109,19 @@ module.exports = (io, app) => {
     securedResponseTo(SocketEvent.LOAD_GAME, gameService.loadGame, true);
     securedResponseTo(SocketEvent.PLAY_MOVE, gameService.playMove, true);
 
+    securedJoinResponseTo(
+      SocketEvent.START_CONVERSATION,
+      conversationService.startConversation
+    );
+    securedJoinResponseTo(
+      SocketEvent.MARK_AS_READ,
+      conversationService.markAsRead
+    );
+    securedJoinResponseTo(
+      SocketEvent.SEND_MESSAGE,
+      conversationService.sendMessage
+    );
+
     socket.on(SocketEvent.JOIN_CHATS.request, async (request) => {
       const response = await conversationService.getConversations(request);
       Array.isArray(response.payload) &&
@@ -102,23 +134,6 @@ module.exports = (io, app) => {
       const conversation = await playerService.getConversation(request);
       conversation && socket.join(conversation.id);
       // console.log(io.sockets.adapter.rooms);
-    });
-
-    socket.on(SocketEvent.START_CONVERSATION.request, async (request) => {
-      const response = await conversationService.startConversation(request);
-      const target = response.payload.id;
-      socket.join(target);
-      return io
-        .to(target)
-        .emit(SocketEvent.START_CONVERSATION.response, response);
-    });
-
-    socket.on(SocketEvent.SEND_MESSAGE.request, async (request) => {
-      const response = await conversationService.sendMessage(request);
-      const target = response.payload.id;
-      socket.join(target);
-      // console.log(io.sockets.adapter.rooms);
-      return io.to(target).emit(SocketEvent.SEND_MESSAGE.response, response);
     });
 
     socket.on("disconnect", async () => {

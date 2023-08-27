@@ -32,6 +32,8 @@ router.get("/players", secured(), async (req, res) => {
   const games = await PlayerService.getOnlineUsers({
     _jwt: req.headers.authorization,
   });
+  const io = req.app.get("io");
+  io.emit("users-changed");
   return res.send(games);
 });
 
