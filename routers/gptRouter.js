@@ -5,7 +5,7 @@ const { successResponse } = require("../domain/Response");
 router.post("/reply", async (req, res) => {
   const startTime = process.hrtime();
   const reply = await gptService.reply(req.body.content);
-  return res.send(successResponse(reply, startTime));
+  return res.status(reply.status).send(successResponse(reply, startTime));
 });
 
 router.post("/translate", async (req, res) => {
@@ -15,7 +15,9 @@ router.post("/translate", async (req, res) => {
     req.body.language
   );
 
-  return res.send(successResponse(translation, startTime));
+  return res
+    .status(translation.status)
+    .send(successResponse(translation, startTime));
 });
 
 module.exports = router;

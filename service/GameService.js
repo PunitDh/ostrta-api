@@ -2,6 +2,7 @@ const {
   errorResponse,
   successResponse,
   notFoundResponse,
+  createdResponse,
 } = require("../domain/Response");
 const { Rock, Paper, Scissors, Lizard, Spock } = require("../domain/Entity");
 const Round = require("../domain/Round");
@@ -17,7 +18,7 @@ const GameService = {
     try {
       const { id } = decodeJWT(request._jwt);
       const game = await GameDAO.createGame(id, request.opponent, request.icon);
-      return successResponse(gameMapper(game));
+      return createdResponse(gameMapper(game));
     } catch (error) {
       return errorResponse(error.message);
     }

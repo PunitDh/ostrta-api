@@ -8,7 +8,7 @@ router.use(secured());
 router.get("/recent", async (req, res) => {
   const { limit } = req.query;
   const games = await GameService.getRecentGames(limit);
-  return res.send(games);
+  return res.status(games.status).send(games);
 });
 
 router.post("/new", async (req, res) => {
@@ -17,22 +17,22 @@ router.post("/new", async (req, res) => {
     opponent: req.body.opponent,
     icon: req.body.icon,
   });
-  return res.send(game);
+  return res.status(game.status).send(game);
 });
 
 router.get("/:id", async (req, res) => {
   const game = await GameService.loadGame({ gameId: req.params.id });
-  return res.send(game);
+  return res.status(game.status).send(game);
 });
 
 router.put("/:id", async (req, res) => {
   const game = await GameService.updateGame(req.params.id, req.body);
-  return res.send(game);
+  return res.status(game.status).send(game);
 });
 
 router.delete("/:id", async (req, res) => {
   const game = await GameService.deleteGame({ gameId: req.params.id });
-  return res.send(game);
+  return res.status(game.status).send(game);
 });
 
 module.exports = router;

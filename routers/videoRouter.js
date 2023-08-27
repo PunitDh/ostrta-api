@@ -7,7 +7,7 @@ const fileUtils = require("../utils/file");
 const { PROGRESS_UPDATE } = require("../domain/SocketEvent");
 const LOGGER = require("../utils/logger");
 const { convertToSeconds } = require("../utils");
-const { successResponse } = require("../domain/Response");
+const { successResponse, errorResponse } = require("../domain/Response");
 const secured = require("../middleware/secured");
 
 router.post(
@@ -16,6 +16,13 @@ router.post(
   fileUpload.single("file"),
   async (req, res) => {
     if (req.body.debug) {
+      if (!req.file || !req.file?.mimetype.includes("video")) {
+        const response = errorResponse(
+          "Invalid video file and/or no video file was found"
+        );
+        return res.status(response.status).send(response);
+      }
+
       const io = req.app.get("io");
       const socketMap = req.app.get("socketMap");
       const startTime = process.hrtime();
@@ -60,14 +67,23 @@ router.post(
       }
 
       setTimeout(() => {
-        return res.send(
-          successResponse(
-            { translation: "fake data", location: "fake location" },
-            startTime
-          )
+        const response = successResponse(
+          {
+            translation: "fake data",
+            location: "fake location",
+            format: req.body.format,
+          },
+          startTime
         );
+        return res.status(response.status).send(response);
       }, delay + 1000);
     } else {
+      if (!req.file || !req.file?.mimetype.includes("video")) {
+        const response = errorResponse(
+          "Invalid video file and/or no video file was found"
+        );
+        return res.status(response.status).send(response);
+      }
       const startTime = process.hrtime();
       const io = req.app.get("io");
       const socketMap = req.app.get("socketMap");
@@ -109,9 +125,11 @@ router.post(
           );
         }
       }
-      return res.send(
-        successResponse({ translation, location, format }, startTime)
+      const response = successResponse(
+        { translation, location, format },
+        startTime
       );
+      return res.status(response.status).send(response);
     }
   }
 );
