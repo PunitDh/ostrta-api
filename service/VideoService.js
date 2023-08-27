@@ -31,7 +31,7 @@ const VideoService = {
     });
   },
 
-  extractSubtitles: async (filename) => {
+  extractSubtitles: async (filename, transcriptionFormat) => {
     const replicate = new Replicate({
       auth: process.env.REPLICATE_API_TOKEN,
     });
@@ -44,7 +44,7 @@ const VideoService = {
         input: {
           audio: uploadedFile.mediaLink,
           model: "large-v2",
-          transcription: "srt",
+          transcription: transcriptionFormat,
           temperature: 0,
           condition_on_previous_text: true,
           temperature_increment_on_fallback: 0.2,
@@ -58,14 +58,14 @@ const VideoService = {
     return transcription;
   },
 
-  translateSubtitles: async (subtitles, language = "English") => {
+  translateSubtitles: async (subtitles, format, language = "English") => {
     if (!subtitles) return "No subtitles found";
-    const prompt = `Can you translate these subtitles into ${language} while retaining all the timestamps? Just give me the output, no explanations. Please retain the timestamps in exactly the right places, that's really important! The output must follow the .srt format. \n\n${subtitles}`;
+    const prompt = `Can you translate these subtitles into ${language} while retaining all the timestamps? Just give me the output, no explanations. Please retain the timestamps in exactly the right places, that's really important! The output must follow the .${format} format. \n\n${subtitles}`;
     return await HttpChatGPTDAO.answer(prompt);
   },
 
-  saveSubtitles: async (subtitles, filename) => {
-    const fullFileName = filename.concat(".srt");
+  saveSubtitles: async (subtitles, filename, format) => {
+    const fullFileName = filename.concat(`.${format}`);
     const location = path.join("public", fullFileName);
     await fs.promises.writeFile(location, subtitles, "utf-8");
     return fullFileName;
