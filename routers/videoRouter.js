@@ -20,7 +20,7 @@ router.post(
         const response = errorResponse(
           "Invalid video file and/or no video file was found"
         );
-        return res.status(response.status).send(response);
+        return res.status(response.code).send(response);
       }
 
       const io = req.app.get("io");
@@ -75,14 +75,14 @@ router.post(
           },
           startTime
         );
-        return res.status(response.status).send(response);
+        return res.status(response.code).send(response);
       }, delay + 1000);
     } else {
       if (!req.file || !req.file?.mimetype.includes("video")) {
         const response = errorResponse(
           "Invalid video file and/or no video file was found"
         );
-        return res.status(response.status).send(response);
+        return res.status(response.code).send(response);
       }
       const startTime = process.hrtime();
       const io = req.app.get("io");
@@ -129,7 +129,7 @@ router.post(
         { translation, location, format },
         startTime
       );
-      return res.status(response.status).send(response);
+      return res.status(response.code).send(response);
     }
   }
 );
