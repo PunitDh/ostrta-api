@@ -4,20 +4,18 @@ const { successResponse } = require("../domain/Response");
 
 router.post("/reply", async (req, res) => {
   const startTime = process.hrtime();
-  const reply = await gptService.reply(req.body.content);
-  return res.status(reply.code).send(successResponse(reply, startTime));
+  const response = await gptService.reply(req.body.content);
+  return res.status(response.code).send(successResponse(response, startTime));
 });
 
 router.post("/translate", async (req, res) => {
   const startTime = process.hrtime();
-  const translation = await gptService.translate(
+  const response = await gptService.translate(
     req.body.content,
     req.body.language
   );
 
-  return res
-    .status(translation.code)
-    .send(successResponse(translation, startTime));
+  return res.status(response.code).send(successResponse(response, startTime));
 });
 
 module.exports = router;

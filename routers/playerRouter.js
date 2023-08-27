@@ -22,9 +22,9 @@ router.get("/games", secured(), async (req, res) => {
 });
 
 router.get("/chats", secured(), async (req, res) => {
-  const chats = await ConversationService.getConversations(
-    req.headers.authorization
-  );
+  const chats = await ConversationService.getConversations({
+    _jwt: req.headers.authorization,
+  });
   return res.status(chats.code).send(chats);
 });
 

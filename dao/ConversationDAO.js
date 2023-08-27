@@ -28,25 +28,27 @@ const ConversationDAO = {
     return conversation;
   },
 
-  findByPlayer: async function (playerId) {
+  findAllByPlayerId: async function (playerId) {
     const conversations = await Conversation.find({
       players: playerId,
-    });
+    }).populate("players");
 
     return conversations;
   },
 
-  findByPlayers: async function (receiver, sender) {
+  findByPlayerIds: async function (receiver, sender) {
     const conversation = await Conversation.findOne({
       players: { $all: [receiver, sender] },
-    });
+    }).populate("players");
+
     return conversation;
   },
 
   startConversation: async function (firstPlayer, secondPlayer) {
-    let conversation = await Conversation.findOne({
-      players: { $all: [firstPlayer, secondPlayer] },
-    }).populate("players");
+    let conversation = await ConversationDAO.findByPlayerIds(
+      firstPlayer,
+      secondPlayer
+    );
 
     if (conversation) {
       return conversation;

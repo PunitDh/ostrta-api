@@ -67,7 +67,7 @@ const PlayerService = {
     const game = await GameDAO.findByIdAndPopulate(request.gameId);
     if (game) {
       const opponentId = game.players.find((it) => it != playerId);
-      const conversation = await ConversationDAO.findByPlayers(
+      const conversation = await ConversationDAO.findByPlayerIds(
         playerId,
         opponentId
       );

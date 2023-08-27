@@ -11,7 +11,7 @@ const ConversationService = {
   async getConversations(request) {
     try {
       const { id } = decodeJWT(request._jwt);
-      const conversations = await ConversationDAO.findByPlayer(id);
+      const conversations = await ConversationDAO.findAllByPlayerId(id);
       return successResponse(conversations.map(conversationMapper));
     } catch (error) {
       return errorResponse(error);
@@ -36,7 +36,7 @@ const ConversationService = {
   async sendMessage(request) {
     try {
       const sender = decodeJWT(request._jwt);
-      const conversation = await ConversationDAO.findByPlayers(
+      const conversation = await ConversationDAO.findByPlayerIds(
         request.receiver,
         sender.id
       );
