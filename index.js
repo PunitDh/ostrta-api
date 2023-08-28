@@ -23,10 +23,6 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-setInterval(async () => {
-  await AppService.cleanupPublicDir();
-}, Time.ONE_HOUR);
-
 mongoose.connectToDB();
 
 socketHandlers(io, app);
@@ -34,6 +30,10 @@ socketHandlers(io, app);
 app.set("io", io);
 
 app.use(routeLogger());
+
+setInterval(async () => {
+  await AppService.cleanupPublicDir();
+}, Time.ONE_HOUR);
 
 app.use("/admin", adminRouter);
 app.use("/games", gamesRouter);

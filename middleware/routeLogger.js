@@ -1,4 +1,4 @@
-const { formatDate, convertToMilliseconds } = require("../utils");
+const { formatDate, convertToMilliseconds } = require("../utils/dateTimeUtils");
 const LOGGER = require("../utils/logger");
 
 function routeLogger() {

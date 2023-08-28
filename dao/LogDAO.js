@@ -5,18 +5,19 @@ const { LogType } = require("../utils/constants");
 const logFile = path.join(".", "log", `${process.env.npm_package_name}.log`);
 
 const getInfo = function (message) {
+  if (!message) return;
   const [type, time] = message.match(new RegExp(/(?<=\[).+?(?=\])/, "g")) || [];
-  return { type: LogType[type], time };
+  const [content] = message.match(new RegExp(/(?<=((^\[).+\]: )).+/));
+  return { type: LogType[type], time, content };
 };
 
 const createMessages = function (logs, type, limit, time) {
-  let id = 0;
-  const createMessage = function (message) {
+  const createMessage = function (message, id) {
     const info = getInfo(message);
-    if (!info.type) return;
+    if (!info) return;
     return {
-      id: id++,
-      content: message,
+      id,
+      content: info.content,
       type: info.type.toLowerCase(),
       time: new Date(info.time),
     };

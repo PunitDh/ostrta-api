@@ -1,6 +1,6 @@
 const JWT = require("jsonwebtoken");
 const LOGGER = require("../utils/logger");
-const { convertToMilliseconds } = require("../utils");
+const { convertToMilliseconds } = require("../utils/dateTimeUtils");
 
 const Status = {
   SUCCESS: "success",
