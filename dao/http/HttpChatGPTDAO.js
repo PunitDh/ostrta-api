@@ -1,8 +1,8 @@
 const axios = require("axios");
 
 const HttpChatGPTDAO = {
-  answer: async function (content) {
-    if (!content) return "No prompt found";
+  answer: async function (prompt) {
+    if (!prompt) return "No prompt found";
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -10,7 +10,7 @@ const HttpChatGPTDAO = {
         messages: [
           {
             role: "user",
-            content,
+            content: prompt,
           },
         ],
         temperature: 0.7,

@@ -10,7 +10,7 @@ const AdminService = {
       );
       return successResponse(settings);
     } catch (error) {
-      return errorResponse("Something went wrong");
+      return errorResponse(error.message);
     }
   },
 
@@ -26,18 +26,18 @@ const AdminService = {
       await settings.save();
       return successResponse(settings);
     } catch (error) {
-      return errorResponse("Something went wrong", error);
+      return errorResponse(error.message);
     }
   },
 
-  getLogs: async (limit, type) => {
-    const messages = await LogDAO.retrieveLogs(type, limit);
-    return successResponse(messages);
+  getLogs: async (limit, type, time) => {
+    const logs = await LogDAO.retrieveLogs(type, limit, time);
+    return successResponse(logs);
   },
 
   clearLogs: async () => {
-    const messages = await LogDAO.clearLogs();
-    return successResponse(messages);
+    const logs = await LogDAO.clearLogs();
+    return successResponse(logs);
   },
 };
 

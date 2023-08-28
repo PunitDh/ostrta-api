@@ -9,8 +9,8 @@ router.get("/settings", async (_, res) => {
 });
 
 router.get("/logs", restricted(), async (req, res) => {
-  const { limit, type } = req.query;
-  const response = await AdminService.getLogs(limit, type);
+  const { limit, type, time } = req.query;
+  const response = await AdminService.getLogs(limit, type, time);
   return res.status(response.code).send(response);
 });
 

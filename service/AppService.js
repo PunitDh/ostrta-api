@@ -6,6 +6,7 @@ const fileUtils = require("../utils/file");
 const AppService = {
   cleanupPublicDir: async () => {
     const files = await fileUtils.getFiles("./public");
+    LOGGER.info("Running cleanup of public files");
     for (const file of files) {
       const fileLocation = `./public/${file}`;
       const { birthtime } = fs.statSync(fileLocation);
