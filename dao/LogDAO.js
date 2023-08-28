@@ -19,7 +19,7 @@ const createMessages = function (logs, type, limit, time) {
       id,
       content: info.content,
       type: info.type.toLowerCase(),
-      time: new Date(info.time),
+      timeStamp: new Date(info.time),
     };
   };
 
@@ -29,7 +29,7 @@ const createMessages = function (logs, type, limit, time) {
       (!type ||
         type === "ALL" ||
         type.toLowerCase() === message.type.toLowerCase()) &&
-      (Number(time) === 0 || message.time.getTime() > Date.now() - Number(time))
+      (Number(time) === 0 || message.timeStamp.getTime() > Date.now() - Number(time))
     );
   };
 
