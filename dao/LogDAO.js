@@ -25,7 +25,9 @@ const createMessages = function (logs, type, limit, time) {
   const filterMessages = function (message) {
     return (
       message &&
-      (!type || type === "ALL" || type === message.type) &&
+      (!type ||
+        type === "ALL" ||
+        type.toLowerCase() === message.type.toLowerCase()) &&
       (Number(time) === 0 || message.time.getTime() > Date.now() - Number(time))
     );
   };
