@@ -13,7 +13,7 @@ const Time = Object.freeze({
   ONE_YEAR: 1000 * 3600 * 24 * 365,
 });
 
-const TerminalColours = Object.freeze({
+const TerminalColor = Object.freeze({
   RESET: "\x1b[0m",
   BRIGHT: "\x1b[1m",
   DIM: "\x1b[2m",
@@ -50,15 +50,15 @@ const LogType = Object.freeze({
   ERROR: "ERROR",
   QUERY: "QUERY",
   TEST: "TEST",
-  UNKNOWN: "UNKNOWN"
+  UNKNOWN: "UNKNOWN",
 });
 
 const LogTerminalColor = Object.freeze({
-  INFO: TerminalColours.FG_BLUE,
-  WARN: TerminalColours.FG_YELLOW,
-  SUCCESS: TerminalColours.FG_GREEN,
-  ERROR: TerminalColours.FG_RED,
-  QUERY: TerminalColours.FG_CYAN,
+  INFO: TerminalColor.FG_BLUE,
+  WARN: TerminalColor.FG_YELLOW,
+  SUCCESS: TerminalColor.FG_GREEN,
+  ERROR: TerminalColor.FG_RED,
+  QUERY: TerminalColor.FG_CYAN,
   TEST: "TEST",
 });
 
@@ -74,7 +74,7 @@ const LogColor = Object.freeze({
 module.exports = {
   corsOptions,
   Time,
-  TerminalColours,
+  TerminalColor,
   LogType,
   LogTerminalColor,
   LogColor,

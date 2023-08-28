@@ -19,11 +19,6 @@ const socketMap = {};
 
 module.exports = function (io, app) {
   io.on(SocketEvent.CONNECTION.request, (socket) => {
-    socket.on(SocketEvent.PROGRESS_UPDATE.request, (request) => {
-      socketMap[request.sessionId] = socket.id;
-      app.set("socketMap", socketMap);
-    });
-
     /**
      *
      * @param {SocketEvent} socketEvent
@@ -134,6 +129,11 @@ module.exports = function (io, app) {
       const conversation = await playerService.getConversation(request);
       conversation && socket.join(conversation.id);
       // console.log(io.sockets.adapter.rooms);
+    });
+
+    socket.on(SocketEvent.PROGRESS_UPDATE.request, (request) => {
+      socketMap[request.sessionId] = socket.id;
+      app.set("socketMap", socketMap);
     });
 
     socket.on("disconnect", async () => {
