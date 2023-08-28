@@ -5,8 +5,8 @@ const ConversationService = require("../service/ConversationService");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const player = await PlayerService.registerPlayer(req.body);
-  return res.status(player.code).send(player);
+  const response = await PlayerService.registerPlayer(req.body);
+  return res.status(response.code).send(response);
 });
 
 router.post("/login", async (req, res) => {
@@ -15,42 +15,42 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/games", secured(), async (req, res) => {
-  const games = await PlayerService.getCurrentGames({
+  const response = await PlayerService.getCurrentGames({
     _jwt: req.headers.authorization,
   });
-  return res.status(games.code).send(games);
+  return res.status(response.code).send(response);
 });
 
 router.get("/chats", secured(), async (req, res) => {
-  const chats = await ConversationService.getConversations({
+  const response = await ConversationService.getConversations({
     _jwt: req.headers.authorization,
   });
-  return res.status(chats.code).send(chats);
+  return res.status(response.code).send(response);
 });
 
 router.get("/players", secured(), async (req, res) => {
-  const games = await PlayerService.getOnlineUsers({
+  const response = await PlayerService.getOnlineUsers({
     _jwt: req.headers.authorization,
   });
   const io = req.app.get("io");
   io.emit("users-changed");
-  return res.status(games.code).send(games);
+  return res.status(response.code).send(response);
 });
 
 router.put("/", secured(), async (req, res) => {
-  const player = await PlayerService.updateProfile({
+  const response = await PlayerService.updateProfile({
     _jwt: req.headers.authorization,
     ...req.body,
   });
-  return res.status(player.code).send(player);
+  return res.status(response.code).send(response);
 });
 
 router.delete("/", secured(), async (req, res) => {
-  const player = await PlayerService.deleteProfile({
+  const response = await PlayerService.deleteProfile({
     password: req.body.password,
     _jwt: req.headers.authorization,
   });
-  return res.status(player.code).send(player);
+  return res.status(response.code).send(response);
 });
 
 module.exports = router;

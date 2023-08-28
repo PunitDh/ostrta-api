@@ -37,9 +37,7 @@ const PlayerService = {
         email: request.email,
       });
 
-      if (!player) {
-        return unauthorizedResponse("Email address not found");
-      }
+      if (!player) return unauthorizedResponse("Email address not found");
 
       if (bcrypt.compareSync(request.password, player.password)) {
         player.isOnline = true;
