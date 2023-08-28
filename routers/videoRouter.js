@@ -79,11 +79,10 @@ router.post(
         return res.status(response.code).send(response);
       });
     } else {
-      const fileId = Math.random().toString(36).slice(2, 9);
+      const id = Math.random().toString(36).slice(2, 9);
       const { language, format } = req.body;
-      const outputFilename = `${fileUtils.extractName(
-        req.file.originalname
-      )}-${fileId}`;
+      const filename = fileUtils.extractName(req.file.originalname);
+      const outputFilename = `${filename}-${id}`;
 
       sendProgressUpdate("Uploading file...");
       const audioFile = await videoService.extractAudio(
