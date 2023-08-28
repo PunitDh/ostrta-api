@@ -26,7 +26,7 @@ const createMessages = function (logs, type, limit, time) {
     return (
       message &&
       (!type || type === "ALL" || type === message.type) &&
-      new Date(time).getTime() > message.time.getTime()
+      (Number(time) === 0 || message.time.getTime() > Date.now() - Number(time))
     );
   };
 
