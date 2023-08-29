@@ -81,11 +81,14 @@ class GameResponse {
 const gameMapper = (game) => new GameResponse(game);
 
 class ConversationResponse {
-  constructor(conversation) {
+  constructor(conversation, opener) {
     if (conversation) {
       this.id = conversation.id || conversation._id;
       this.players = conversation.players.map(playerMapper);
       this.messages = conversation.messages;
+      if (opener) {
+        this.opener = opener;
+      }
     }
   }
 }
@@ -95,8 +98,8 @@ class ConversationResponse {
  * @param {Conversation} conversation
  * @returns {ConversationResponse}
  */
-const conversationMapper = (conversation) =>
-  new ConversationResponse(conversation);
+const conversationMapper = (conversation, opener) =>
+  new ConversationResponse(conversation, opener);
 
 module.exports = {
   playerMapper,

@@ -33,7 +33,9 @@ const ConversationDAO = {
       players: playerId,
     }).populate("players");
 
-    return conversations;
+    return conversations.filter(
+      (conversation) => conversation.players.length === 2
+    );
   },
 
   findByPlayerIds: async function (receiver, sender) {

@@ -27,7 +27,7 @@ const ConversationService = {
         secondPlayer
       );
 
-      return successResponse(conversationMapper(conversation));
+      return successResponse(conversationMapper(conversation, firstPlayer));
     } catch (error) {
       return errorResponse(error.message);
     }
