@@ -29,7 +29,7 @@ const GameService = {
       const game = await GameDAO.updateGame(gameId, update);
       return successResponse(gameMapper(game));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -40,7 +40,7 @@ const GameService = {
       });
       return successResponse(gameMapper(game));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -51,7 +51,7 @@ const GameService = {
       });
       return successResponse(gameMapper(game));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -62,7 +62,7 @@ const GameService = {
       });
       return successResponse(gameMapper(game));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -71,7 +71,7 @@ const GameService = {
       const games = await GameDAO.getRecentGames(limit);
       return successResponse(games.map(gameMapper));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -80,7 +80,7 @@ const GameService = {
       const game = await Game.findByIdAndDelete(request.gameId);
       return successResponse(gameMapper(game));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 

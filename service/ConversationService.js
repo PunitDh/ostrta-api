@@ -14,7 +14,7 @@ const ConversationService = {
       const conversations = await ConversationDAO.findAllByPlayerId(id);
       return successResponse(conversations.map(conversationMapper));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -29,7 +29,7 @@ const ConversationService = {
 
       return successResponse(conversationMapper(conversation));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
@@ -58,7 +58,7 @@ const ConversationService = {
 
       return createdResponse(conversationMapper(newConversation));
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 

@@ -47,7 +47,7 @@ const PlayerService = {
         return unauthorizedResponse("Passwords do not match");
       }
     } catch (error) {
-      return errorResponse(error);
+      return errorResponse(error.message);
     }
   },
 
