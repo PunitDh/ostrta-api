@@ -86,6 +86,8 @@ class ConversationResponse {
       this.id = conversation.id || conversation._id;
       this.players = conversation.players.map(playerMapper);
       this.messages = conversation.messages;
+      this.createdAt = conversation.createdAt;
+      this.updatedAt = conversation.updatedAt;
       if (opener) {
         this.opener = opener;
       }
