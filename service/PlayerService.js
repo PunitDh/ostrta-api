@@ -31,15 +31,23 @@ const PlayerService = {
     }
   },
 
-  async loginPlayer(request) {
+  async loginPlayer(authHeaders) {
     try {
+      if (!authHeaders) return unauthorizedResponse();
+      const [type, credentials] = authHeaders.split(" ");
+      if (type !== "Basic") return unauthorizedResponse();
+
+      const [email, password] = Buffer.from(credentials, "base64")
+        .toString()
+        .split(":");
+
       const player = await Player.findOne({
-        email: request.email,
+        email,
       });
 
       if (!player) return unauthorizedResponse("Email address not found");
 
-      if (bcrypt.compareSync(request.password, player.password)) {
+      if (bcrypt.compareSync(password, player.password)) {
         player.isOnline = true;
         await player.save();
         return jwtResponse(playerMapper(player));

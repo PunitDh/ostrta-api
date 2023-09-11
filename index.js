@@ -19,6 +19,7 @@ const LOGGER = require("./utils/logger");
 const port = process.env.PORT || 3000;
 
 app.use(cors(corsOptions));
+// app.use(cors());
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
