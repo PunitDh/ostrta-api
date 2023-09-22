@@ -10,7 +10,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const response = await PlayerService.loginPlayer(req.headers.authorization);
+  const response = await PlayerService.loginPlayer(req.headers.authorization, req.body.remember);
   return res.status(response.code).send(response);
 });
 

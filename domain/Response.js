@@ -75,9 +75,9 @@ function notFoundResponse(message = "Not Found") {
   return response;
 }
 
-function jwtResponse(payload) {
+function jwtResponse(payload, longExpiry) {
   const jwt = JWT.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: longExpiry ? "30d" : "1d",
   });
   return createdResponse(jwt);
 }

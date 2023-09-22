@@ -31,7 +31,7 @@ const PlayerService = {
     }
   },
 
-  async loginPlayer(authHeaders) {
+  async loginPlayer(authHeaders, longExpiry = false) {
     try {
       if (!authHeaders) return unauthorizedResponse();
       const [type, credentials] = authHeaders.split(" ");
@@ -50,7 +50,7 @@ const PlayerService = {
       if (bcrypt.compareSync(password, player.password)) {
         player.isOnline = true;
         await player.save();
-        return jwtResponse(playerMapper(player));
+        return jwtResponse(playerMapper(player), longExpiry);
       } else {
         return unauthorizedResponse("Passwords do not match");
       }
