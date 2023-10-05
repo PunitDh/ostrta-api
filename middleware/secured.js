@@ -1,8 +1,12 @@
-const { unauthorizedResponse } = require("../domain/Response");
-const { isAuthenticated } = require("../utils/security");
+import { NextFunction, Request, Response } from "express";
+import { unauthorizedResponse } from "../domain/Response";
+import { isAuthenticated } from "../utils/security";
 
-module.exports = () => (req, res, next) => {
-  return isAuthenticated({ _jwt: req.headers.authorization })
-    ? next()
-    : res.status(401).send(unauthorizedResponse());
-};
+function secured() {
+  return (req, res, next) =>
+    isAuthenticated({ _jwt: req.headers.authorization })
+      ? next()
+      : res.status(401).send(unauthorizedResponse());
+}
+
+module.exports = secured;

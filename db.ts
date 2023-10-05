@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
-const LOGGER = require("./utils/logger");
+import mongoose from "mongoose";
+import LOGGER from "./utils/logger";
 
-const connectToDB = () =>
+const connectToDatabase = () =>
   mongoose
-    .connect(process.env.MONGODB_URL)
+    .connect(process.env.MONGODB_URL!)
     .then((response) =>
       LOGGER.info(
         "Successfully connected to MongoDB cluster:",
@@ -12,4 +12,4 @@ const connectToDB = () =>
     )
     .catch((error) => LOGGER.error("Failed to connect to MongoDB", error));
 
-module.exports = { connectToDB };
+export { connectToDatabase };

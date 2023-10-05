@@ -69,6 +69,8 @@ const GameService = {
   async getRecentGames(limit) {
     try {
       const games = await GameDAO.getRecentGames(limit);
+
+      // console.log({ filteredGames });
       return successResponse(games.map(gameMapper));
     } catch (error) {
       return errorResponse(error.message);

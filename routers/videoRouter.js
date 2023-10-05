@@ -121,4 +121,63 @@ router.post(
   }
 );
 
+router.post(
+  "/audio/extract",
+  secured(),
+  fileUpload.single("file"),
+  async (req, res) => {
+    const startTime = process.hrtime();
+    const io = req.app.get("io");
+    const socketMap = req.app.get("socketMap");
+
+    function sendProgressUpdate(update) {
+      if (typeof socketMap === "object") {
+        LOGGER.info(update);
+        io.to(socketMap[req.body.sessionId]).emit(
+          PROGRESS_UPDATE.response,
+          update
+        );
+      }
+    }
+
+    if (!req.file || !req.file?.mimetype.includes("video")) {
+      const response = errorResponse(
+        "Invalid video file and/or no video file was found"
+      );
+      return res.status(response.code).send(response);
+    }
+
+    const id = Math.random().toString(36).slice(2, 9);
+    const { language, format } = req.body;
+    const filename = fileUtils.extractName(req.file.originalname);
+    const outputFilename = `${filename}-${id}`;
+
+    sendProgressUpdate("Extracting audio...");
+    const audioFile = await videoService.extractAudio(
+      req.file,
+      outputFilename,
+      sendProgressUpdate
+    );
+
+    sendProgressUpdate("Extracting audio...");
+
+    sendProgressUpdate(`Generating subtitles file on server`);
+    const location = await videoService.saveAudio(
+      translation,
+      outputFilename,
+      format
+    );
+
+    await videoService.cleanupTempDir();
+    const endTime = convertToSeconds(process.hrtime(startTime)).toFixed(2);
+
+    sendProgressUpdate(`Completed in ${endTime}s`);
+    const response = successResponse(
+      { translation, location, format },
+      startTime
+    );
+    return res.status(response.code).send(response);
+  }
+);
+
 module.exports = router;

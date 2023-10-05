@@ -1,8 +1,9 @@
-const { formatDate, convertToMilliseconds } = require("../utils/dateTimeUtils");
-const LOGGER = require("../utils/logger");
+import { NextFunction, Request, Response } from "express";
+import { formatDate, convertToMilliseconds } from "../utils/dateTimeUtils";
+import LOGGER from "../utils/logger";
 
-function routeLogger() {
-  return (req, res, next) => {
+export default function routeLogger() {
+  return (req: Request, res: Response, next: NextFunction) => {
     const startTime = process.hrtime();
     const date = formatDate(new Date());
     const url = `"${req.url}"`;
@@ -26,5 +27,3 @@ function routeLogger() {
     next();
   };
 }
-
-module.exports = routeLogger;

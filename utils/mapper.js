@@ -22,7 +22,7 @@ const playerMapper = (player) => ({
 class MoveResponse {
   constructor(move) {
     if (move) {
-      this.id = move._id;
+      // this.id = move._id;
       this.move = encoder.encodeString(
         move.move,
         process.env.GAME_ENCRYPTION_KEY

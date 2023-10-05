@@ -7,3 +7,5 @@ ignore
 temp
 public
 log/*.log
+dist
+.vscode/

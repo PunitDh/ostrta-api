@@ -1,24 +1,18 @@
-const {
-  Status,
-  unauthorizedResponse,
-  forbiddenResponse,
-} = require("../domain/Response");
-const SocketEvent = require("../domain/SocketEvent");
-const adminService = require("../service/AdminService");
-const conversationService = require("../service/ConversationService");
-const gameService = require("../service/GameService");
-const playerService = require("../service/PlayerService");
-const LOGGER = require("../utils/logger");
-const {
-  decodeJWT,
-  isAuthenticated,
-  isAuthorized,
-} = require("../utils/security");
+import SocketEvent from "../domain/SocketEvent";
 
-const socketMap = {};
+import { Status, unauthorizedResponse, forbiddenResponse } from "../domain/Response";
+import adminService from "../service/AdminService";
+import conversationService from "../service/ConversationService";
+import gameService from "../service/GameService";
+import playerService from "../service/PlayerService";
+import LOGGER from "../utils/logger";
+import { decodeJWT, isAuthenticated, isAuthorized } from "../utils/security";
+import { Socket } from "socket.io";
 
-module.exports = function (io, app) {
-  io.on(SocketEvent.CONNECTION.request, (socket) => {
+const socketMap: any = {};
+
+export default function (io: any, app: any) {
+  io.on(SocketEvent.CONNECTION.request, (socket: Socket) => {
     /**
      *
      * @param {SocketEvent} socketEvent
@@ -27,7 +21,7 @@ module.exports = function (io, app) {
      * @param {Boolean} useRoom
      * @returns {*}
      */
-    const socketResponse = async (socketEvent, callback, request, useRoom) => {
+    const socketResponse = async (socketEvent: SocketEvent, callback: any, request: any, useRoom: boolean) => {
       const { email } = decodeJWT(request._jwt);
       email && (socketMap[email] = socket.id);
       const player = await playerService.goOnline(socketMap, socket.id);
@@ -50,11 +44,11 @@ module.exports = function (io, app) {
      * @param {Boolean} useGameRoom
      */
     const securedResponseTo = function (
-      socketEvent,
-      callback,
+      socketEvent: SocketEvent,
+      callback: any,
       useGameRoom = false
     ) {
-      socket.on(socketEvent.request, (request) =>
+      socket.on(socketEvent.request, (request: any) =>
         isAuthenticated(request)
           ? socketResponse(socketEvent, callback, request, useGameRoom)
           : io.to(socket.id).emit(Status.UNAUTHORIZED, unauthorizedResponse())
@@ -62,19 +56,19 @@ module.exports = function (io, app) {
     };
 
     const restrictedResponseTo = function (
-      socketEvent,
-      callback,
+      socketEvent: SocketEvent,
+      callback: any,
       useGameRoom = false
     ) {
-      socket.on(socketEvent.request, (request) =>
+      socket.on(socketEvent.request, (request: any) =>
         isAuthorized(request)
           ? socketResponse(socketEvent, callback, request, useGameRoom)
           : io.to(socket.id).emit(Status.FORBIDDEN, forbiddenResponse())
       );
     };
 
-    const securedJoinResponseTo = async function (socketEvent, callback) {
-      socket.on(socketEvent.request, async (request) => {
+    const securedJoinResponseTo = async function (socketEvent: SocketEvent, callback: any) {
+      socket.on(socketEvent.request, async (request: any) => {
         if (isAuthenticated(request)) {
           const response = await callback(request);
           const target = response.payload.id;
@@ -117,7 +111,7 @@ module.exports = function (io, app) {
       conversationService.sendMessage
     );
 
-    socket.on(SocketEvent.JOIN_CHATS.request, async (request) => {
+    socket.on(SocketEvent.JOIN_CHATS.request, async (request: any) => {
       const response = await conversationService.getConversations(request);
       Array.isArray(response.payload) &&
         response.payload.forEach((conversation) =>
@@ -125,13 +119,13 @@ module.exports = function (io, app) {
         );
     });
 
-    socket.on(SocketEvent.JOIN_CHAT.request, async (request) => {
+    socket.on(SocketEvent.JOIN_CHAT.request, async (request: any) => {
       const conversation = await playerService.getConversation(request);
-      conversation && socket.join(conversation.id);
+      conversation && socket.join((conversation as any).id);
       // console.log(io.sockets.adapter.rooms);
     });
 
-    socket.on(SocketEvent.PROGRESS_UPDATE.request, (request) => {
+    socket.on(SocketEvent.PROGRESS_UPDATE.request, (request: any) => {
       socketMap[request.sessionId] = socket.id;
       app.set("socketMap", socketMap);
     });
