@@ -87,6 +87,7 @@ router.post(
       sendProgressUpdate("Uploading file...");
       const audioFile = await videoService.extractAudio(
         req.file,
+        "temp",
         outputFilename,
         sendProgressUpdate
       );
@@ -148,34 +149,24 @@ router.post(
     }
 
     const id = Math.random().toString(36).slice(2, 9);
-    const { language, format } = req.body;
+    const { format } = req.body;
     const filename = fileUtils.extractName(req.file.originalname);
     const outputFilename = `${filename}-${id}`;
 
     sendProgressUpdate("Extracting audio...");
-    const audioFile = await videoService.extractAudio(
+    const location = await videoService.extractAudio(
       req.file,
+      "public",
       outputFilename,
       sendProgressUpdate
     );
 
     sendProgressUpdate("Extracting audio...");
-
-    sendProgressUpdate(`Generating subtitles file on server`);
-    const location = await videoService.saveAudio(
-      translation,
-      outputFilename,
-      format
-    );
-
-    await videoService.cleanupTempDir();
     const endTime = convertToSeconds(process.hrtime(startTime)).toFixed(2);
 
     sendProgressUpdate(`Completed in ${endTime}s`);
-    const response = successResponse(
-      { translation, location, format },
-      startTime
-    );
+    const response = successResponse({ location }, startTime);
+
     return res.status(response.code).send(response);
   }
 );

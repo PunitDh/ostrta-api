@@ -8,12 +8,12 @@ const fileUtils = require("../utils/file");
 const HttpChatGPTDAO = require("../dao/http/HttpChatGPTDAO");
 
 const VideoService = {
-  extractAudio: async (file, filename, sendProgressUpdate) => {
-    const videoFileName = `./temp/${file.originalname}`;
+  extractAudio: async (file, location, filename, sendProgressUpdate) => {
+    const videoFileName = `./${location}/${file.originalname}`;
     await fs.promises.writeFile(videoFileName, file.buffer);
 
     sendProgressUpdate("Extracting audio...");
-    const audioFileName = `./temp/${filename}.mp3`;
+    const audioFileName = `./${location}/${filename}.mp3`;
     ffmpeg.setFfmpegPath(ffmpegStatic);
 
     return new Promise((resolve, reject) => {

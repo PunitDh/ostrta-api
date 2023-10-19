@@ -53,19 +53,19 @@ function noContentResponse(payload, code = 204) {
 
 function errorResponse(message, code = 400) {
   const response = new Response(Status.ERROR, message, code);
-  LOGGER.error(response);
+  // LOGGER.error(response);
   return response;
 }
 
 function unauthorizedResponse(message = "Unauthorized") {
   const response = new Response(Status.UNAUTHORIZED, message, 401);
-  LOGGER.error(response);
+  // LOGGER.error(response);
   return response;
 }
 
 function forbiddenResponse(message = "Forbidden") {
   const response = new Response(Status.FORBIDDEN, message, 403);
-  LOGGER.error(response);
+  // LOGGER.error(response);
   return response;
 }
 
