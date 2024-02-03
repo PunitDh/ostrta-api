@@ -36,7 +36,11 @@ const VideoService = {
       auth: process.env.REPLICATE_API_TOKEN,
     });
 
+    console.log("Replicate created");
+
     const [_, uploadedFile] = await StorageService.uploadFile(filename);
+
+    console.log("Uploading done", filename);
 
     const { transcription } = await replicate.run(
       process.env.OPENAI_WHISPER_VERSION,
@@ -54,6 +58,9 @@ const VideoService = {
         },
       }
     );
+
+    console.log("Transcription done");
+
 
     return transcription;
   },
