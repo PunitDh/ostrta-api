@@ -1,11 +1,9 @@
 const fs = require("fs");
 const ffmpegStatic = require("ffmpeg-static");
 const ffmpeg = require("fluent-ffmpeg");
-const Replicate = require("replicate");
-const StorageService = require("./StorageService");
 const path = require("path");
 const fileUtils = require("../utils/file");
-const HttpChatGPTDAO = require("../dao/http/HttpChatGPTDAO");
+const HttpOpenAIDAO = require("../dao/http/HttpOpenAIDAO");
 
 const VideoService = {
   extractAudio: async (file, filename, sendProgressUpdate) => {
@@ -32,43 +30,13 @@ const VideoService = {
   },
 
   extractSubtitles: async (filename, transcriptionFormat) => {
-    const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN,
-    });
-
-    console.log("Replicate created");
-
-    const [_, uploadedFile] = await StorageService.uploadFile(filename);
-
-    console.log("Uploading done", filename);
-
-    const { transcription } = await replicate.run(
-      process.env.OPENAI_WHISPER_VERSION,
-      {
-        input: {
-          audio: uploadedFile.mediaLink,
-          model: "large-v2",
-          transcription: transcriptionFormat,
-          temperature: 0,
-          condition_on_previous_text: true,
-          temperature_increment_on_fallback: 0.2,
-          compression_ratio_threshold: 2.4,
-          logprob_threshold: -1,
-          no_speech_threshold: 0.6,
-        },
-      }
-    );
-
-    console.log("Transcription done");
-
-
-    return transcription;
+    return await HttpOpenAIDAO.transcribe(filename, transcriptionFormat);
   },
 
   translateSubtitles: async (subtitles, format, language = "English") => {
     if (!subtitles) return "No subtitles found";
     const prompt = `Can you translate these subtitles into ${language} while retaining all the timestamps? Just give me the output, no explanations. Please retain the timestamps in exactly the right places, that's really important! The output must follow the .${format} format. \n\n${subtitles}`;
-    return await HttpChatGPTDAO.answer(prompt);
+    return await HttpOpenAIDAO.answer(prompt);
   },
 
   saveSubtitles: async (subtitles, filename, format) => {

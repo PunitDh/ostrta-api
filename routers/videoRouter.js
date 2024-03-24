@@ -4,11 +4,29 @@ const multer = require("multer");
 const fileUpload = multer();
 const videoService = require("../service/VideoService");
 const fileUtils = require("../utils/file");
-const { PROGRESS_UPDATE } = require("../domain/SocketEvent");
+const SocketEvent = require("../domain/SocketEvent");
 const LOGGER = require("../utils/logger");
 const { convertToSeconds } = require("../utils/dateTimeUtils");
 const { successResponse, errorResponse } = require("../domain/Response");
 const secured = require("../middleware/secured");
+
+// router.get('/subtitles/sse', secured(), (req,res) => {
+//   console.log('Client connected');
+//   res.setHeader('Content-Type', 'text/event-stream');
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+
+//   const intervalId = setInterval(() => {
+//     const date = new Date().toLocaleDateString();
+//     res.write(`data: ${date}`);
+
+//   }, 1000);
+
+//   res.on('close', () => {
+//     console.log('Client closed connection');
+//     clearInterval(intervalId);
+//     res.end();
+//   })
+// })
 
 router.post(
   "/subtitles/translate",
@@ -23,7 +41,7 @@ router.post(
       if (typeof socketMap === "object") {
         LOGGER.info(update);
         io.to(socketMap[req.body.sessionId]).emit(
-          PROGRESS_UPDATE.response,
+          SocketEvent.PROGRESS_UPDATE.response,
           update
         );
       }
