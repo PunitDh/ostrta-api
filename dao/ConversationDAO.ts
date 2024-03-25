@@ -1,4 +1,4 @@
-const Conversation = require("../models/Conversation");
+import Conversation from "../models/Conversation";
 
 const ConversationDAO = {
   findById: async function (conversationId: string) {
@@ -12,23 +12,23 @@ const ConversationDAO = {
   ) {
     const conversation = await ConversationDAO.findById(conversationId);
 
-    conversation.messages.push({
+    conversation!.messages.push({
       content,
       sender,
-    });
+    } as any);
 
-    await conversation.save();
+    await conversation!.save();
     return conversation;
   },
 
   markAsRead: async function (conversationId: string, player: string) {
     const conversation = await ConversationDAO.findById(conversationId);
-    conversation.messages
+    conversation!.messages
       .filter((message: any) => !message.read && message.sender != player)
       .forEach((message: any) => {
         message.read = true;
       });
-    await conversation.save();
+    await conversation!.save();
     return conversation;
   },
 
@@ -69,7 +69,7 @@ const ConversationDAO = {
     });
 
     const createdConversation = await ConversationDAO.findById(
-      conversation._id
+      conversation._id.toString()
     );
 
     return createdConversation;
@@ -84,7 +84,11 @@ const ConversationDAO = {
       players[0],
       players[1]
     );
-    await this.updateWithMessage(createdConversation._id, message, sender);
+    await this.updateWithMessage(
+      createdConversation!._id.toString(),
+      message,
+      sender
+    );
     return createdConversation;
   },
 };

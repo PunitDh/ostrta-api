@@ -12,7 +12,7 @@ const ConversationService = {
     try {
       const { id } = decodeJWT(request._jwt);
       const conversations = await ConversationDAO.findAllByPlayerId(id);
-      return successResponse(conversations.map(conversationMapper));
+      return successResponse(conversations.map(conversationMapper as any));
     } catch (error: any) {
       return errorResponse(error.message);
     }
@@ -48,7 +48,7 @@ const ConversationService = {
 
       if (conversation) {
         const updatedConversation = await ConversationDAO.updateWithMessage(
-          conversation._id,
+          conversation._id.toString(),
           request.message,
           sender.id
         );
