@@ -82,7 +82,7 @@ async function startVideoProcessing(req: Request, res: Response, id: string) {
   if (req.body.debug) {
     let delay = 1000;
 
-    function timedFunction(fn) {
+    function timedFunction(fn: () => void) {
       setTimeout(fn, delay);
       delay += 1000;
     }
@@ -126,7 +126,7 @@ async function startVideoProcessing(req: Request, res: Response, id: string) {
 
     sendProgressUpdate("Uploading file...");
     const audioFile = await videoService.extractAudio(
-      req.file,
+      req.file!,
       outputFilename,
       sendProgressUpdate
     );

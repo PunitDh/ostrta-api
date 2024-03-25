@@ -1,6 +1,9 @@
 import SocketEvent from "../domain/SocketEvent";
-
-import { Status, unauthorizedResponse, forbiddenResponse } from "../domain/Response";
+import {
+  Status,
+  unauthorizedResponse,
+  forbiddenResponse,
+} from "../domain/APIResponse";
 import adminService from "../service/AdminService";
 import conversationService from "../service/ConversationService";
 import gameService from "../service/GameService";
@@ -21,7 +24,12 @@ export default function (io: any, app: any) {
      * @param {Boolean} useRoom
      * @returns {*}
      */
-    const socketResponse = async (socketEvent: SocketEvent, callback: any, request: any, useRoom: boolean) => {
+    const socketResponse = async (
+      socketEvent: SocketEvent,
+      callback: any,
+      request: any,
+      useRoom: boolean
+    ) => {
       const { email } = decodeJWT(request._jwt);
       email && (socketMap[email] = socket.id);
       const player = await playerService.goOnline(socketMap, socket.id);
@@ -67,7 +75,10 @@ export default function (io: any, app: any) {
       );
     };
 
-    const securedJoinResponseTo = async function (socketEvent: SocketEvent, callback: any) {
+    const securedJoinResponseTo = async function (
+      socketEvent: SocketEvent,
+      callback: any
+    ) {
       socket.on(socketEvent.request, async (request: any) => {
         if (isAuthenticated(request)) {
           const response = await callback(request);
@@ -114,7 +125,7 @@ export default function (io: any, app: any) {
     socket.on(SocketEvent.JOIN_CHATS.request, async (request: any) => {
       const response = await conversationService.getConversations(request);
       Array.isArray(response.payload) &&
-        response.payload.forEach((conversation) =>
+        response.payload.forEach((conversation: any) =>
           socket.join(conversation.id)
         );
     });
@@ -134,4 +145,4 @@ export default function (io: any, app: any) {
       await playerService.goOffline(socketMap, socket.id);
     });
   });
-};
+}

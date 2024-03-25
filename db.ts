@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import LOGGER from "./utils/logger";
 
-const connectToDatabase = () =>
+export const connectToDatabase = () =>
   mongoose
     .connect(process.env.MONGODB_URL!)
     .then((response) =>
@@ -11,5 +11,3 @@ const connectToDatabase = () =>
       )
     )
     .catch((error) => LOGGER.error("Failed to connect to MongoDB", error));
-
-export { connectToDatabase };

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { forbiddenResponse } from "../domain/Response";
+import { forbiddenResponse } from "../domain/APIResponse";
 import { isAuthorized } from "../utils/security";
 
 export default function restricted() {
