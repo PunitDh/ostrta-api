@@ -1,11 +1,12 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
 import bodyParser from "body-parser";
 import cors from "cors";
-import mongoose from "./db";
+import {connectToDatabase} from "./db";
 import { corsOptions, Time } from "./utils/constants";
 import videoRouter from "./routers/videoRouter";
 import playerRouter from "./routers/playerRouter";
@@ -24,7 +25,7 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-mongoose.connectToDB();
+connectToDatabase();
 
 socketHandlers(io, app);
 

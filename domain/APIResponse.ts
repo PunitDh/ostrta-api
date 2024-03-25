@@ -11,7 +11,7 @@ export enum Status {
   FORBIDDEN = "forbidden",
 }
 
-class APIResponse {
+export class APIResponse {
   status: any;
   payload: any;
   code: any;
@@ -85,9 +85,9 @@ export function notFoundResponse(message: string = "Not Found"): APIResponse {
   return response;
 }
 
-export function jwtResponse(payload: any): APIResponse {
+export function jwtResponse(payload: any, longExpiry: boolean = false): APIResponse {
   const jwt = JWT.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: longExpiry ? "30d" : "1d",
   });
   return createdResponse(jwt);
 }

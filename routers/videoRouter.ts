@@ -40,15 +40,15 @@ router.post(
       return res.status(400).send("A video file is required");
     }
 
-    const id = Math.random().toString(36).slice(2, 9);
+    const taskId = Math.random().toString(36).slice(2, 9);
 
-    tasks[id] = {
-      id,
+    tasks[taskId] = {
+      id: taskId,
       status: "Pending",
     };
 
-    startVideoProcessing(req, res, id);
-    return res.status(200).send(tasks[id]);
+    startVideoProcessing(req, res, taskId);
+    return res.status(200).send(successResponse(tasks[taskId]));
   }
 );
 
@@ -56,15 +56,14 @@ router.get("/task-status/:taskId", async (req: Request, res: Response) => {
   const { taskId } = req.params;
   const task = tasks[taskId];
   if (task) {
-    res.send(successResponse(task));
-  } else {
-    res
-      .status(404)
-      .send(notFoundResponse(`Task with id '${taskId}' not found`));
+    return res.send(successResponse(task));
   }
+  return res
+    .status(404)
+    .send(notFoundResponse(`Task with id '${taskId}' not found`));
 });
 
-async function startVideoProcessing(req: Request, res: Response, id: string) {
+async function startVideoProcessing(req: Request, res: Response, taskId: string) {
   const startTime = process.hrtime();
   const io = req.app.get("io");
   const socketMap = req.app.get("socketMap");
@@ -82,7 +81,7 @@ async function startVideoProcessing(req: Request, res: Response, id: string) {
   if (req.body.debug) {
     let delay = 1000;
 
-    function timedFunction(fn) {
+    function timedFunction(fn: () => void) {
       setTimeout(fn, delay);
       delay += 1000;
     }
@@ -122,11 +121,11 @@ async function startVideoProcessing(req: Request, res: Response, id: string) {
   } else {
     const { language, format } = req.body;
     const filename = fileUtils.extractName(req.file!.originalname);
-    const outputFilename = `${filename}-${id}`;
+    const outputFilename = `${filename}-${taskId}`;
 
     sendProgressUpdate("Uploading file...");
     const audioFile = await videoService.extractAudio(
-      req.file,
+      req.file!,
       outputFilename,
       sendProgressUpdate
     );
@@ -149,14 +148,18 @@ async function startVideoProcessing(req: Request, res: Response, id: string) {
     );
 
     await videoService.cleanupTempDir();
-    const endTime = convertToSeconds(process.hrtime(startTime)).toFixed(2);
+    const responseTime = convertToSeconds(process.hrtime(startTime)).toFixed(2);
 
-    sendProgressUpdate(`Completed in ${endTime}s`);
-    const response = successResponse(
-      { translation, location, format },
-      startTime
-    );
-    return res.status(response.code).send(response);
+    sendProgressUpdate(`Completed in ${responseTime}s`);
+
+    tasks[taskId] = {
+      translation,
+      location,
+      format,
+      responseTime,
+      status: "Completed",
+      id: taskId,
+    };
   }
 }
 
