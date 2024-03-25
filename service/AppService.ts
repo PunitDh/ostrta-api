@@ -12,14 +12,18 @@ const AppService = {
     );
     for (const file of files) {
       const fileLocation = `./public/${file}`;
-      const { birthtime } = fs.statSync(fileLocation);
+      const { birthtime, size } = fs.statSync(fileLocation);
       const timeDiff = getTimeDiff(Date.now(), birthtime);
       LOGGER.info(
         `'${file}' is ${timeDiff.hours} hours ${timeDiff.minutes} mins old`
       );
       if (timeDiff.hours >= 24) {
         await fs.promises.rm(fileLocation);
-        LOGGER.info(`Cleaned ${fileLocation}`);
+        const sizeKB = size / 1024;
+        const sizeMB = sizeKB / 1024;
+        const sizeDisplay =
+          sizeMB < 1 ? `${sizeKB.toFixed(2)}KB` : `${sizeMB.toFixed(2)}MB`;
+        LOGGER.info(`Cleaned ${fileLocation} (${sizeDisplay}`);
       }
     }
     return true;

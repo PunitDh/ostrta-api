@@ -15,8 +15,14 @@ const FileUtils = {
   cleanUpDir: async function (folder: string): Promise<boolean> {
     const files = await this.getFiles(folder);
     for (const file of files) {
-      await fs.promises.rm(`${folder}/${file}`);
-      LOGGER.info(`Cleaned ${folder}/${file}`);
+      const fileLocation = `${folder}/${file}`;
+      const { size } = fs.statSync(fileLocation);
+      const sizeKB = size / 1024;
+      const sizeMB = sizeKB / 1024;
+      const sizeDisplay =
+        sizeMB < 1 ? `${sizeKB.toFixed(2)} KB` : `${sizeMB.toFixed(2)} MB`;
+      await fs.promises.rm(fileLocation);
+      LOGGER.info(`Cleaned ${folder}/${file} (${sizeDisplay})`);
     }
     return true;
   },
