@@ -1,4 +1,4 @@
-const { unauthorizedResponse } = require("../domain/Response");
+const { unauthorizedResponse } = require("../domain/APIResponse");
 const { isAuthenticated } = require("../utils/security");
 
 module.exports = () => (req, res, next) => {
