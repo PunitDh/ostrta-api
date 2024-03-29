@@ -6,23 +6,30 @@ const FileUtils = {
     return originalname.split(".").slice(0, -1).join(".").split(" ").join("-");
   },
 
-  getFiles: async function (folder: string) {
+  getFiles: async function (folder: string): Promise<string[]> {
     return (await fs.promises.readdir(folder)).filter(
       (file: string) => file !== ".keep"
     );
+  },
+
+  getFileSizeString: function (file: string): string {
+    const { size: sizeB } = fs.statSync(file);
+    const sizeKB = sizeB / 1024;
+    const sizeMB = sizeKB / 1024;
+    return sizeMB < 1
+      ? sizeKB < 1
+        ? `${sizeB.toFixed(2)} B`
+        : `${sizeKB.toFixed(2)} KB`
+      : `${sizeMB.toFixed(2)} MB`;
   },
 
   cleanUpDir: async function (folder: string): Promise<boolean> {
     const files = await this.getFiles(folder);
     for (const file of files) {
       const fileLocation = `${folder}/${file}`;
-      const { size } = fs.statSync(fileLocation);
-      const sizeKB = size / 1024;
-      const sizeMB = sizeKB / 1024;
-      const sizeDisplay =
-        sizeMB < 1 ? `${sizeKB.toFixed(2)} KB` : `${sizeMB.toFixed(2)} MB`;
+      const size = this.getFileSizeString(fileLocation);
       await fs.promises.rm(fileLocation);
-      LOGGER.info(`Cleaned ${folder}/${file} (${sizeDisplay})`);
+      LOGGER.info(`Cleaned ${folder}/${file} (${size})`);
     }
     return true;
   },

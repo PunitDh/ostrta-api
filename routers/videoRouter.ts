@@ -47,7 +47,7 @@ router.post(
       status: "Pending",
     };
 
-    startVideoProcessing(req, res, taskId);
+    startVideoProcessing(req, taskId);
     return res.status(200).send(successResponse(tasks[taskId]));
   }
 );
@@ -63,7 +63,7 @@ router.get("/task-status/:taskId", async (req: Request, res: Response) => {
     .send(notFoundResponse(`Task with id '${taskId}' not found`));
 });
 
-async function startVideoProcessing(req: Request, res: Response, taskId: string) {
+async function startVideoProcessing(req: Request, taskId: string) {
   const startTime = process.hrtime();
   const io = req.app.get("io");
   const socketMap = req.app.get("socketMap");
@@ -116,7 +116,7 @@ async function startVideoProcessing(req: Request, res: Response, taskId: string)
         },
         startTime
       );
-      return res.status(response.code).send(response);
+      // return res.status(response.code).send(response);
     });
   } else {
     const { language, format } = req.body;
