@@ -18,8 +18,8 @@ const AppService = {
         `'${file}' is ${timeDiff.hours} hours ${timeDiff.minutes} mins old`
       );
       if (timeDiff.hours >= 24) {
-        await fs.promises.rm(fileLocation);
         const size = fileUtils.getFileSizeString(fileLocation);
+        await fs.promises.rm(fileLocation);
         LOGGER.info(`Cleaned ${fileLocation} (${size}`);
       }
     }

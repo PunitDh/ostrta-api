@@ -2,6 +2,8 @@ const fs = require("fs");
 import LOGGER from "./logger";
 
 const FileUtils = {
+  byteSize: 1024,
+
   extractName: function (originalname: string): string {
     return originalname.split(".").slice(0, -1).join(".").split(" ").join("-");
   },
@@ -14,11 +16,11 @@ const FileUtils = {
 
   getFileSizeString: function (file: string): string {
     const { size: sizeB } = fs.statSync(file);
-    const sizeKB = sizeB / 1024;
-    const sizeMB = sizeKB / 1024;
+    const sizeKB = sizeB / this.byteSize;
+    const sizeMB = sizeKB / this.byteSize;
     return sizeMB < 1
       ? sizeKB < 1
-        ? `${sizeB.toFixed(2)} B`
+        ? `${sizeB} B`
         : `${sizeKB.toFixed(2)} KB`
       : `${sizeMB.toFixed(2)} MB`;
   },

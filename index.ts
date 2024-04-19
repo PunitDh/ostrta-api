@@ -6,28 +6,27 @@ const http = require("http").Server(app);
 const io = require("socket.io")(http);
 import bodyParser from "body-parser";
 import cors from "cors";
-import {connectToDatabase} from "./db";
+import { connectToDatabase } from "./db";
 import { corsOptions, Time } from "./utils/constants";
 import videoRouter from "./routers/videoRouter";
 import playerRouter from "./routers/playerRouter";
 import gamesRouter from "./routers/gamesRouter";
 import adminRouter from "./routers/adminRouter";
 import gptRouter from "./routers/gptRouter";
-import socketHandlers from "./handlers/SocketHandler";
+import initializeSocketHandlers from "./handlers/SocketHandler";
 import AppService from "./service/AppService";
 import routeLogger from "./middleware/routeLogger";
 import LOGGER from "./utils/logger";
 const port = process.env.PORT || 3000;
 
 app.use(cors(corsOptions));
-// app.use(cors());
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 connectToDatabase();
 
-socketHandlers(io, app);
+initializeSocketHandlers(io, app);
 
 app.set("io", io);
 
